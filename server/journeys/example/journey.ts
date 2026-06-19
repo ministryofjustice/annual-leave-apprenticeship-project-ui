@@ -4,7 +4,7 @@ import { ExampleEffects } from './effects'
 import { Page } from '../../services/auditService'
 
 const exampleStep = step({
-  path: '/',
+  path: '/home',
   title: 'Home',
   reachability: { entryWhen: true },
   onAccess: [
@@ -13,7 +13,7 @@ const exampleStep = step({
     }),
   ],
   blocks: [
-    GovUKHeading({ text: 'This site is under construction...', size: 'l' }),
+    GovUKHeading({ text: 'Annual leave app', size: 'l' }),
     GovUKBody({ text: 'Please check back later when there is content to view.' }),
     GovUKBody({
       text: Format('The time is currently %1', Data('currentTime')),
