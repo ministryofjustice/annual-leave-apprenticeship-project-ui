@@ -1,17 +1,17 @@
 
 
 services:
-  hmpps-template-kotlin:
-    ports:
-      - "8080:8080"
-
-  hmpps-auth:
-    ports:
-      - "9090:8080"
-
-  wiremock:
-    ports:
-      - "9091:8080"
+#  hmpps-template-kotlin:
+#    ports:
+#      - "8080:8080"
+#
+#  hmpps-auth:
+#    ports:
+#      - "9090:8080"
+#
+#  wiremock:
+#    ports:
+#      - "9091:8080"
 
   ui:
     build:

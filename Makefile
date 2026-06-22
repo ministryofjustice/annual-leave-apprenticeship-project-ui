@@ -3,7 +3,7 @@ SHELL = /bin/bash
 PROJECT_NAME = hmpps-template-typescript
 
 SERVICE_NAME = ui
-DEPENDENCY_SERVICES = redis hmpps-auth hmpps-template-kotlin wiremock
+#DEPENDENCY_SERVICES = redis hmpps-auth hmpps-template-kotlin wiremock
 
 APP_VERSION ?= local
 NODE_MODULES_LAYOUT_VERSION = standalone-layout-v1
@@ -35,7 +35,7 @@ dev-build: ## Builds a development image of the app and installs Node dependenci
 
 dev-up: ## Starts/restarts a development container. A remote debugger can be attached on port 9229.
 	@make install-node-modules
-	@docker compose ${DEV_COMPOSE_FILES} up ${SERVICE_NAME} ${DEPENDENCY_SERVICES} --wait --no-recreate
+	@docker compose ${DEV_COMPOSE_FILES} up ${SERVICE_NAME} --wait --no-recreate
 
 down: ## Stops and removes all containers in the project.
 	@docker compose ${DEV_COMPOSE_FILES} down --remove-orphans

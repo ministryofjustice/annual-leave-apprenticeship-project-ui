@@ -1,9 +1,12 @@
 import { HmppsUser } from '../../interfaces/hmppsUser'
+import type { LoginResponse } from '../../data/annualLeaveApiClient'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
+    user: LoginResponse
+    loginError: string
   }
 }
 
@@ -23,6 +26,7 @@ export declare global {
 
     interface Locals {
       user: HmppsUser
+      sessionUser?: LoginResponse
       cspNonce: string
       csrfToken: string
       asset_path: string

@@ -1,16 +1,16 @@
 
 services:
-  hmpps-template-kotlin:
-    ports:
-      - "8080:8080"
+#  hmpps-template-kotlin:
+#    ports:
+#      - "8080:8080"
 
-  hmpps-auth:
-    ports:
-      - "9090:8080"
+#  hmpps-auth:
+#    ports:
+#      - "9090:8080"
 
-  wiremock:
-    ports:
-      - "9091:8080"
+#  wiremock:
+#    ports:
+#      - "9091:8080"
 
   ui:
     build:
@@ -30,6 +30,7 @@ services:
       NODE_ENV: development
       ENVIRONMENT_NAME: dev
       TOKEN_VERIFICATION_ENABLED: true
+      ANNUAL_LEAVE_API_URL: http://host.docker.internal:8080
 
 volumes:
   node_modules:

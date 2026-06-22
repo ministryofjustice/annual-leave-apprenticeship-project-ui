@@ -1,3 +1,19 @@
 .govuk-main-wrapper {
   min-height: 600px;
 }
+
+.govuk-template {
+  background-color: govuk-colour("white");
+}
+
+.numeric-data {
+  padding-right: 3em;
+
+  .numeric-data__item {
+    margin-bottom: 0;
+
+    &:first-of-type {
+      padding-right: 10px;
+    }
+  }
+}

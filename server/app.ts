@@ -18,7 +18,7 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 import type { Services } from './services'
-import examplePackage from './journeys/example'
+import annualLeavePackage from './forms/annual-leave'
 import logger from './logger'
 
 export default function createApp(services: Services): express.Application {
@@ -42,9 +42,9 @@ export default function createApp(services: Services): express.Application {
   })
   forge.registerGlobalComponents(govukComponents)
   forge.registerGlobalComponents(mojComponents)
-  forge.registerPackage(examplePackage, {
+  forge.registerPackage(annualLeavePackage, {
     auditService: services.auditService,
-    exampleService: services.exampleService,
+    annualLeaveApiClient: services.annualLeaveApiClient,
   })
 
   // TODO: Disabled these middleware as they are HMPPS Auth specific
@@ -52,6 +52,17 @@ export default function createApp(services: Services): express.Application {
   // app.use(authorisationMiddleware())
   // app.use(setUpCurrentUser())
   app.use(setUpCsrf())
+
+  app.use((req, res, next) => {
+    res.locals.sessionUser = req.session?.user
+    next()
+  })
+
+  app.get('/sign-out', (req, res) => {
+    req.session.destroy(() => {
+      res.redirect('/login')
+    })
+  })
 
   app.use(forge.getRouter() as express.Router)
 
