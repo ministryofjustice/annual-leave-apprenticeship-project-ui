@@ -1,5 +1,6 @@
 import { createForgePackage, journey } from '@ministryofjustice/hmpps-forge/core/authoring'
 import type { AnnualLeaveDeps } from './effects/types'
+import { sidebarStatsComponent } from './components/sidebarStats'
 import loginJourney from './journeys/login'
 import homeStep from './journeys/dashboard/steps/home/step'
 import effectImplementations from './effects'
@@ -15,6 +16,7 @@ const annualLeaveRootJourney = journey({
 
 export default createForgePackage<AnnualLeaveDeps>({
   journey: annualLeaveRootJourney,
+  components: [sidebarStatsComponent],
   functions: {
     ...effectImplementations,
   },

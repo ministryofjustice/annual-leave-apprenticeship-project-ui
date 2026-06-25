@@ -1,4 +1,4 @@
-import { Condition, Data, Format } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { Condition, Data } from '@ministryofjustice/hmpps-forge/core/authoring'
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import {
   GovUKGridRow,
@@ -7,6 +7,7 @@ import {
   GovUKTable,
   GovUKTabs,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
+import { SidebarStats } from '../../../../components/sidebarStats'
 
 const pageHeading = GovUKHeading({
   text: 'Dashboard',
@@ -35,35 +36,14 @@ const submitButton = GovUKLinkButton({
   classes: 'govuk-button--primary',
 })
 
-const sidebarStats = HtmlBlock({
-  content: Format(
-    `<div class="dashboard-stats">
-  <div class="dashboard-stats__card">
-    <span class="govuk-heading-l govuk-!-margin-bottom-0">DAYS</span>
-  </div>
-  <div class="dashboard-stats__card dashboard-stats__card--blue">
-    <span class="dashboard-stats__number govuk-heading-l govuk-!-margin-bottom-0">%1<span class="govuk-body">/%5</span></span>
-    <span class="dashboard-stats__label govuk-body govuk-!-margin-bottom-0">Balance</span>
-  </div>
-  <div class="dashboard-stats__card dashboard-stats__card--green">
-    <span class="dashboard-stats__number govuk-heading-l govuk-!-margin-bottom-0">%2<span class="govuk-body">/%5</span></span>
-    <span class="dashboard-stats__label govuk-body govuk-!-margin-bottom-0">Available</span>
-  </div>
-  <div class="dashboard-stats__card dashboard-stats__card--yellow">
-    <span class="dashboard-stats__number govuk-heading-l govuk-!-margin-bottom-0">%3<span class="govuk-body">/%5</span></span>
-    <span class="dashboard-stats__label govuk-body govuk-!-margin-bottom-0">Pending</span>
-  </div>
-  <div class="dashboard-stats__card dashboard-stats__card--grey">
-    <span class="dashboard-stats__number govuk-heading-l govuk-!-margin-bottom-0">%4<span class="govuk-body">/%5</span></span>
-    <span class="dashboard-stats__label govuk-body govuk-!-margin-bottom-0">Used</span>
-  </div>
-</div>`,
-    Data('actualBalance'),
-    Data('availableBalance'),
-    Data('pendingDays'),
-    Data('approvedDays'),
-    Data('annualEntitlement'),
-  ),
+const sidebarStats = SidebarStats({
+  heading: 'DAYS',
+  entries: [
+    { label: 'Balance', value: Data('actualBalance'), total: Data('annualEntitlement'), style: 'blue' },
+    { label: 'Available', value: Data('availableBalance'), total: Data('annualEntitlement'), style: 'green' },
+    { label: 'Pending', value: Data('pendingDays'), total: Data('annualEntitlement'), style: 'yellow' },
+    { label: 'Used', value: Data('approvedDays'), total: Data('annualEntitlement'), style: 'grey' },
+  ],
 })
 
 const activeRequestsTable = GovUKTable({
