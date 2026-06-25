@@ -1,0 +1,36 @@
+.dashboard-stats {
+  display: flex;
+  flex-direction: column;
+  gap: govuk-spacing(3);
+}
+
+.dashboard-stats__card {
+  border-left: govuk-spacing(3) solid govuk-colour("light-grey");
+  padding: govuk-spacing(3);
+  background-color: govuk-colour("light-grey");
+
+  &--blue {
+    border-left-color: govuk-colour("blue");
+  }
+
+  &--green {
+    border-left-color: govuk-colour("green");
+  }
+
+  &--yellow {
+    border-left-color: govuk-colour("yellow");
+  }
+
+  &--grey {
+    border-left-color: govuk-colour("dark-grey");
+  }
+}
+
+.dashboard-stats__number {
+  display: block;
+}
+
+.dashboard-stats__label {
+  display: block;
+  color: govuk-colour("dark-grey");
+}

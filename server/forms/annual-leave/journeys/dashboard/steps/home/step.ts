@@ -1,13 +1,13 @@
 import { access, step } from '@ministryofjustice/hmpps-forge/core/authoring'
 import { AnnualLeaveEffects } from '../../../../effects'
 import { redirectToLoginIfUnauthenticated } from '../../../../guards'
-import { annualEntitlement, greeting, welcomeMessage } from './fields'
+import dashboardPage from './fields'
 
 export default step({
   path: '/dashboard',
   title: 'Dashboard',
   reachability: { entryWhen: true },
-  blocks: [greeting, welcomeMessage, annualEntitlement],
+  blocks: [dashboardPage],
   onAccess: [
     redirectToLoginIfUnauthenticated(),
     access({

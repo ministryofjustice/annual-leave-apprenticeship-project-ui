@@ -1,5 +1,6 @@
 import logger from '../../../../logger'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
+import toUserLeaveRequestTableRow from '../helpers'
 
 const loadRequests = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
   const session = context.getSession()
@@ -11,8 +12,8 @@ const loadRequests = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffec
   try {
     const { userRequests } = await deps.annualLeaveApiClient.getRequests(session.user.id)
 
-    const activeRows = userRequests.filter(r => r.status === 'PENDING')
-    const historyRows = userRequests.filter(r => r.status !== 'PENDING')
+    const activeRows = userRequests.filter(r => r.status === 'PENDING').map(toUserLeaveRequestTableRow)
+    const historyRows = userRequests.filter(r => r.status !== 'PENDING').map(toUserLeaveRequestTableRow)
 
     context.setData('activeRequestRows', activeRows)
     context.setData('historyRequestRows', historyRows)
