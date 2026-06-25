@@ -9,8 +9,8 @@ export const redirectToLoginIfUnauthenticated = () =>
     next: [redirect({ when: not(isAuthenticated), goto: '/login' })],
   })
 
-export const redirectToHomeIfAuthenticated = () =>
+export const redirectToDashboardIfAuthenticated = () =>
   access({
     effects: [AnnualLeaveEffects.loadUserFromSession()],
-    next: [redirect({ when: isAuthenticated, goto: '/home' })],
+    next: [redirect({ when: isAuthenticated, goto: '/dashboard' })],
   })

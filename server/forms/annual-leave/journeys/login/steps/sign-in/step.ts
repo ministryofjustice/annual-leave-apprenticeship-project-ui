@@ -1,6 +1,6 @@
 import { access, Condition, Data, redirect, step, submit } from '@ministryofjustice/hmpps-forge/core/authoring'
 import { AnnualLeaveEffects } from '../../../../effects'
-import { redirectToHomeIfAuthenticated } from '../../../../guards'
+import { redirectToDashboardIfAuthenticated } from '../../../../guards'
 import { emailField, errorAlert, heading, passwordField, signInButton } from './fields'
 
 export default step({
@@ -9,7 +9,7 @@ export default step({
   reachability: { entryWhen: true },
   blocks: [heading, errorAlert, emailField, passwordField, signInButton],
   onAccess: [
-    redirectToHomeIfAuthenticated(),
+    redirectToDashboardIfAuthenticated(),
     access({
       effects: [AnnualLeaveEffects.loadLoginError()],
     }),
@@ -24,7 +24,7 @@ export default step({
             when: Data('loginError').match(Condition.IsRequired()),
             goto: '/login',
           }),
-          redirect({ goto: '/home' }),
+          redirect({ goto: '/dashboard' }),
         ],
       },
     }),

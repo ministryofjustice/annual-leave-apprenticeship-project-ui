@@ -4,23 +4,24 @@
 
 {% set mainClasses = "govuk-body" %}
 
+{% set fullPageTitle = step.title + ' - ' + ancestors[0].title %}
+{% set pageTitle %}
+  {{ fullPageTitle }}
+{% endset %}
+
 {% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% if fieldValidationErrors | length %}
-        {{ govukErrorSummary({
-          titleText: "There is a problem",
-          errorList: fieldValidationErrors | toErrorSummary
-        }) }}
-      {% endif %}
+  {% if fieldValidationErrors | length %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: fieldValidationErrors | toErrorSummary
+    }) }}
+  {% endif %}
 
-      <form id="main-form" method="post" novalidate>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+  <form id="main-form" method="post" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-        {% for block in blocks %}
-          {{ block | safe }}
-        {% endfor %}
-      </form>
-    </div>
-  </div>
+    {% for block in blocks %}
+      {{ block | safe }}
+    {% endfor %}
+  </form>
 {% endblock %}

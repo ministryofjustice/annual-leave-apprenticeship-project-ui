@@ -12,6 +12,7 @@ const loadUserFromSession = (_deps: AnnualLeaveDeps) => async (context: AnnualLe
   context.setData('userEmail', session.user.email)
   context.setData('userId', session.user.id)
   context.setData('annualEntitlement', session.user.annualEntitlement)
+  context.setData('isManager', session.user.isManager)
 }
 
 export default loadUserFromSession

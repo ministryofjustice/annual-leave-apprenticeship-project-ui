@@ -1,15 +1,6 @@
 import config from '../config'
 import logger from '../logger'
-
-export interface LoginResponse {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  managerId: string | null
-  annualEntitlement: number
-  isManager: boolean
-}
+import { BalanceResponse, LoginResponse, RequestsResponse } from '../interfaces/annualLeaveApi/response'
 
 export default class AnnualLeaveApiClient {
   private readonly apiUrl: string
@@ -34,5 +25,31 @@ export default class AnnualLeaveApiClient {
     }
 
     return response.json() as Promise<LoginResponse>
+  }
+
+  async getRequests(userId: string): Promise<RequestsResponse> {
+    const response = await fetch(`${this.apiUrl}/requests`, {
+      headers: { 'X-User-Id': userId },
+    })
+
+    if (!response.ok) {
+      logger.warn({ status: response.status }, 'Failed to fetch requests')
+      throw new Error('Failed to fetch requests')
+    }
+
+    return response.json() as Promise<RequestsResponse>
+  }
+
+  async getBalance(userId: string): Promise<BalanceResponse> {
+    const response = await fetch(`${this.apiUrl}/balance`, {
+      headers: { 'X-User-Id': userId },
+    })
+
+    if (!response.ok) {
+      logger.warn({ status: response.status }, 'Failed to fetch balance')
+      throw new Error('Failed to fetch balance')
+    }
+
+    return response.json() as Promise<BalanceResponse>
   }
 }

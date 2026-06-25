@@ -2,7 +2,7 @@ import type { EffectFunctionContext } from '@ministryofjustice/hmpps-forge/core/
 import type { Session } from 'express-session'
 import type AuditService from '../../../services/auditService'
 import type AnnualLeaveApiClient from '../../../data/annualLeaveApiClient'
-import type { LoginResponse } from '../../../data/annualLeaveApiClient'
+import { LoginResponse } from '../../../interfaces/annualLeaveApi/response'
 
 export interface AnnualLeaveDeps {
   auditService: AuditService

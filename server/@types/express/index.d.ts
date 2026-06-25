@@ -1,5 +1,5 @@
 import { HmppsUser } from '../../interfaces/hmppsUser'
-import type { LoginResponse } from '../../data/annualLeaveApiClient'
+import { LoginResponse } from '../../interfaces/annualLeaveApi/response'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
