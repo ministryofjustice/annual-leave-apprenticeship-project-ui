@@ -1,4 +1,4 @@
-import { block as buildBlock } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { block as blockBuilder } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
   buildComponent,
   type BasicBlockProps,
@@ -24,7 +24,7 @@ export interface SidebarStats extends BlockDefinition, SidebarStatsProps {
 }
 
 export const SidebarStats = (props: SidebarStatsProps): SidebarStats => {
-  return buildBlock<SidebarStats>({ ...props, variant: 'sidebarStats' })
+  return blockBuilder<SidebarStats>({ ...props, variant: 'sidebarStats' })
 }
 
 export const sidebarStatsComponent = buildComponent<SidebarStats>('sidebarStats', block => {
