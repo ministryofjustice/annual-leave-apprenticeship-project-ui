@@ -14,3 +14,5 @@ export const redirectToDashboardIfAuthenticated = () =>
     effects: [AnnualLeaveEffects.loadUserFromSession()],
     next: [redirect({ when: isAuthenticated, goto: '/dashboard' })],
   })
+
+export const isLoadRequestError = Data('loadRequestsError').match(Condition.Equals(true))

@@ -1,4 +1,4 @@
-import { Condition, Data, Item, Iterator } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { Condition, Data, Item, Iterator, not } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
   GovUKBody,
   GovUKButtonGroup,
@@ -9,6 +9,7 @@ import {
   GovUKTabs,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { SidebarStats } from '../../../../components/sidebarStats'
+import { isLoadRequestError } from '../../../../guards'
 
 const pageHeading = GovUKHeading({
   text: 'Dashboard',
@@ -96,6 +97,29 @@ const requestsTabs = GovUKTabs({
   ],
 })
 
+const errorHeading = GovUKHeading({
+  text: 'Sorry, there is a problem',
+  size: 'xl',
+})
+
+const errorReason = GovUKBody({
+  text: 'We are experiencing issues getting your annual leave data.',
+})
+
+const errorActionSuggestion = GovUKBody({
+  text: 'Try reloading the page. You can do this by pressing F5 (on a PC), or Cmd + R (on a Mac).',
+})
+
+const dashboardErrorPage = GovUKGridRow({
+  columns: [
+    {
+      width: 'full',
+      blocks: [errorHeading, errorReason, errorActionSuggestion],
+    },
+  ],
+  visibleWhen: isLoadRequestError,
+})
+
 const dashboardPage = GovUKGridRow({
   columns: [
     {
@@ -107,6 +131,7 @@ const dashboardPage = GovUKGridRow({
       blocks: [pageHeading, actionButtons, requestsTabs],
     },
   ],
+  visibleWhen: not(isLoadRequestError),
 })
 
-export default dashboardPage
+export default [dashboardErrorPage, dashboardPage]

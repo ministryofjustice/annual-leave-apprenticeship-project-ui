@@ -19,6 +19,7 @@ const loadRequests = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffec
     const approvedRequests = sorted.filter(r => r.status === 'APPROVED').map(formatLeaveRequest)
     const rejectedRequests = sorted.filter(r => r.status === 'REJECTED').map(formatLeaveRequest)
 
+    context.setData('loadRequestsError', false)
     context.setData('pendingRequests', pendingRequests)
     context.setData('approvedRequests', approvedRequests)
     context.setData('rejectedRequests', rejectedRequests)
@@ -30,6 +31,7 @@ const loadRequests = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffec
     const message = error instanceof Error ? error.message : 'Failed to fetch requests'
 
     logger.error({ userId: session.user.id }, `Load requests failed: ${message}`)
+    context.setData('loadRequestsError', true)
     context.setData('pendingRequests', [])
     context.setData('approvedRequests', [])
     context.setData('rejectedRequests', [])
