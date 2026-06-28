@@ -1,27 +1,18 @@
-import { Condition, Data, Item, Iterator, not, Format, when } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { Condition, Data, Item, Iterator, not } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
   GovUKBody,
   GovUKButtonGroup,
-  GovUKDetails,
-  GovUKGridRow,
   GovUKHeading,
   GovUKLinkButton,
   GovUKTable,
   GovUKTabs,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
-import { SidebarStats } from '../../../../components/sidebarStats'
+import { fullWidthLayout, sidebarLayout } from '../../../../sharedBlocks'
 import { isLoadRequestError } from '../../../../guards'
 
 const pageHeading = GovUKHeading({
   text: 'Dashboard',
   size: 'xl',
-})
-
-const managerDetails = GovUKDetails({
-  summaryText: 'Your manager details',
-  text: when(Data('managerName').match(Condition.IsRequired()))
-    .then(Data('managerName'))
-    .else("You haven't been assigned a manager"),
 })
 
 const managerHubLinkButton = GovUKLinkButton({
@@ -39,16 +30,6 @@ const submitNewRequestLinkButton = GovUKLinkButton({
 
 const actionButtons = GovUKButtonGroup({
   buttons: [managerHubLinkButton, submitNewRequestLinkButton],
-})
-
-const sidebarStats = SidebarStats({
-  heading: 'DAYS',
-  entries: [
-    { label: 'Balance', value: Data('actualBalance'), total: Data('annualEntitlement'), style: 'blue' },
-    { label: 'Available', value: Data('availableBalance'), total: Data('annualEntitlement'), style: 'green' },
-    { label: 'Pending', value: Data('pendingDays'), style: 'yellow' },
-    { label: 'Approved', value: Data('approvedDays'), style: 'grey' },
-  ],
 })
 
 const noRequestsMessage = (hasDataKey: string, requestStatus: string) =>
@@ -118,28 +99,10 @@ const errorActionSuggestion = GovUKBody({
   text: 'Try reloading the page. You can do this by pressing F5 (on a PC), or Cmd + R (on a Mac).',
 })
 
-const dashboardErrorPage = GovUKGridRow({
-  columns: [
-    {
-      width: 'full',
-      blocks: [errorHeading, errorReason, errorActionSuggestion],
-    },
-  ],
-  visibleWhen: isLoadRequestError,
-})
+const dashboardErrorPage = fullWidthLayout([errorHeading, errorReason, errorActionSuggestion])
+dashboardErrorPage.visibleWhen = isLoadRequestError
 
-const dashboardPage = GovUKGridRow({
-  columns: [
-    {
-      width: 'one-quarter',
-      blocks: [managerDetails, sidebarStats],
-    },
-    {
-      width: 'three-quarters',
-      blocks: [pageHeading, actionButtons, requestsTabs],
-    },
-  ],
-  visibleWhen: not(isLoadRequestError),
-})
+const dashboardPage = sidebarLayout([pageHeading, actionButtons, requestsTabs])
+dashboardPage.visibleWhen = not(isLoadRequestError)
 
 export default [dashboardErrorPage, dashboardPage]
