@@ -79,6 +79,7 @@ export default {
         response: Number(get('ANNUAL_LEAVE_API_TIMEOUT_RESPONSE', 5000)),
         deadline: Number(get('ANNUAL_LEAVE_API_TIMEOUT_DEADLINE', 5000)),
       },
+      agent: new AgentConfig(Number(get('ANNUAL_LEAVE_API_TIMEOUT_RESPONSE', 5000))),
     },
   },
   sqs: {
