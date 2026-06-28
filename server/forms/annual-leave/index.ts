@@ -3,7 +3,7 @@ import type { AnnualLeaveDeps } from './effects/types'
 import { sidebarStatsComponent } from './components/sidebarStats'
 import { confirmModalComponent } from './components/confirmModal'
 import loginJourney from './journeys/login'
-import homeStep from './journeys/dashboard/steps/home/step'
+import dashboardStep from './journeys/leave-request-management/steps/dashboard/step'
 import effectImplementations from './effects'
 
 const annualLeaveRootJourney = journey({
@@ -11,7 +11,7 @@ const annualLeaveRootJourney = journey({
   title: 'Annual Leave App',
   path: '/',
   view: { template: 'annual-leave/views/annual-leave-step' },
-  steps: [homeStep],
+  steps: [dashboardStep],
   children: [loginJourney],
 })
 

@@ -1,5 +1,5 @@
 import { journey } from '@ministryofjustice/hmpps-forge/core/authoring'
-import homeStep from './steps/home/step'
+import homeStep from './steps/dashboard/step'
 
 const dashboardJourney = journey({
   code: 'dashboard',
