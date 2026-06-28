@@ -1,4 +1,3 @@
-import type { LeaveRequest } from '../../interfaces/annualLeaveApi/shared'
 import {
   escapeHtml,
   formatDate,
@@ -8,6 +7,7 @@ import {
   formatLeaveRequest,
 } from './helpers'
 import leaveRequestStatuses from './constants'
+import { AssignedLeaveRequestItem } from '../../interfaces/annualLeaveApi/response'
 
 describe('helpers', () => {
   describe('escapeHtml()', () => {
@@ -77,7 +77,7 @@ describe('helpers', () => {
   })
 
   describe('formatLeaveRequest()', () => {
-    const baseRequest: LeaveRequest = {
+    const baseRequest: AssignedLeaveRequestItem = {
       id: 'req-1',
       createdAt: '2026-06-01T10:00:00Z',
       decisionAt: null,
@@ -91,6 +91,7 @@ describe('helpers', () => {
       status: 'PENDING',
       creatorNote: 'Holiday',
       approverNote: null,
+      creatorName: 'User Userovich',
     }
 
     it('should format all fields correctly', () => {

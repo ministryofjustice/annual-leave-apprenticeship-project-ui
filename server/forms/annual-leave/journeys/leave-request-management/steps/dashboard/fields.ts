@@ -1,7 +1,8 @@
-import { Condition, Data, Item, Iterator, not } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { Condition, Data, Item, Iterator, not, Format, when } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
   GovUKBody,
   GovUKButtonGroup,
+  GovUKDetails,
   GovUKGridRow,
   GovUKHeading,
   GovUKLinkButton,
@@ -14,6 +15,13 @@ import { isLoadRequestError } from '../../../../guards'
 const pageHeading = GovUKHeading({
   text: 'Dashboard',
   size: 'xl',
+})
+
+const managerDetails = GovUKDetails({
+  summaryText: 'Your manager details',
+  text: when(Data('managerName').match(Condition.IsRequired()))
+    .then(Data('managerName'))
+    .else("You haven't been assigned a manager"),
 })
 
 const managerHubLinkButton = GovUKLinkButton({
@@ -124,7 +132,7 @@ const dashboardPage = GovUKGridRow({
   columns: [
     {
       width: 'one-quarter',
-      blocks: [sidebarStats],
+      blocks: [managerDetails, sidebarStats],
     },
     {
       width: 'three-quarters',

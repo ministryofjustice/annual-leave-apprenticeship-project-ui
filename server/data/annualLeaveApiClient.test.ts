@@ -39,6 +39,7 @@ describe('AnnualLeaveApiClient', () => {
         lastName: 'Smith',
         email: 'alice@example.com',
         managerId: 'manager-456',
+        managerName: 'Bob Jones',
         annualEntitlement: 25,
         isManager: false,
       }

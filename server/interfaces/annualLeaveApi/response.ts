@@ -6,8 +6,12 @@ export interface LoginResponse {
   lastName: string
   email: string
   managerId: string | null
+  managerName: string
   annualEntitlement: number
   isManager: boolean
+}
+export interface AssignedLeaveRequestItem extends LeaveRequest {
+  creatorName: string
 }
 
 export interface RequestsResponse {
