@@ -1,6 +1,7 @@
-import { Condition, Data } from '@ministryofjustice/hmpps-forge/core/authoring'
-import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
+import { Condition, Data, Item, Iterator } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
+  GovUKBody,
+  GovUKButtonGroup,
   GovUKGridRow,
   GovUKHeading,
   GovUKLinkButton,
@@ -12,28 +13,23 @@ import { SidebarStats } from '../../../../components/sidebarStats'
 const pageHeading = GovUKHeading({
   text: 'Dashboard',
   size: 'xl',
-  visibleWhen: Data('isManager').not.match(Condition.Equals(true)),
 })
 
-const pageHeadingWithActionHub = HtmlBlock({
-  content: `
-    <div class="moj-page-header-actions">
-      <div class="moj-page-header-actions__title">
-        <h1 class="govuk-heading-xl">Dashboard</h1>
-      </div>
-      <div class="moj-page-header-actions__actions">
-        <div class="moj-button-group moj-button-group--inline">
-          <a href="/manager-hub" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">Manager hub</a>
-        </div>
-      </div>
-    </div>`,
+const managerHubLinkButton = GovUKLinkButton({
+  text: 'Go to Manager Hub',
+  href: '/manager-hub',
+  classes: 'govuk-button--secondary',
   visibleWhen: Data('isManager').match(Condition.Equals(true)),
 })
 
-const submitButton = GovUKLinkButton({
-  text: '+ Submit a new leave request',
+const submitNewRequestLinkButton = GovUKLinkButton({
+  text: 'Submit a new absence request',
   href: '/submit-new-request',
   classes: 'govuk-button--primary',
+})
+
+const actionButtons = GovUKButtonGroup({
+  buttons: [managerHubLinkButton, submitNewRequestLinkButton],
 })
 
 const sidebarStats = SidebarStats({
@@ -41,45 +37,61 @@ const sidebarStats = SidebarStats({
   entries: [
     { label: 'Balance', value: Data('actualBalance'), total: Data('annualEntitlement'), style: 'blue' },
     { label: 'Available', value: Data('availableBalance'), total: Data('annualEntitlement'), style: 'green' },
-    { label: 'Pending', value: Data('pendingDays'), total: Data('annualEntitlement'), style: 'yellow' },
-    { label: 'Used', value: Data('approvedDays'), total: Data('annualEntitlement'), style: 'grey' },
+    { label: 'Pending', value: Data('pendingDays'), style: 'yellow' },
+    { label: 'Approved', value: Data('approvedDays'), style: 'grey' },
   ],
 })
 
-const activeRequestsTable = GovUKTable({
-  head: [
-    { text: 'Duration' },
-    { text: 'Start date' },
-    { text: 'End date' },
-    { text: 'Requested on' },
-    { text: 'Status' },
-  ],
-  rows: Data('activeRequestRows'),
-})
+const noRequestsMessage = (hasDataKey: string, requestStatus: string) =>
+  GovUKBody({
+    text: `There are no ${requestStatus} requests here yet.`,
+    visibleWhen: Data(hasDataKey).not.match(Condition.Equals(true)),
+  })
 
-const historyTable = GovUKTable({
-  head: [
-    { text: 'Duration' },
-    { text: 'Start date' },
-    { text: 'End date' },
-    { text: 'Requested on' },
-    { text: 'Status' },
-  ],
-  rows: Data('historyRequestRows'),
-})
+const createRequestsTable = (dataKey: string, hasDataKey: string) =>
+  GovUKTable({
+    head: [
+      { text: 'Duration' },
+      { text: 'Start date' },
+      { text: 'End date' },
+      { text: 'Requested on' },
+      { text: 'Status' },
+      { text: 'Action' },
+    ],
+    rows: Data(dataKey).each(
+      Iterator.Map([
+        { text: Item().path('duration') },
+        { text: Item().path('startDate') },
+        { text: Item().path('endDate') },
+        { text: Item().path('requestedOn') },
+        { html: Item().path('statusTag') },
+        { html: Item().path('viewLink') },
+      ]),
+    ),
+    visibleWhen: Data(hasDataKey).match(Condition.Equals(true)),
+  })
+
+const pendingRequestsTable = createRequestsTable('pendingRequests', 'hasPendingRequests')
+const approvedRequestsTable = createRequestsTable('approvedRequests', 'hasApprovedRequests')
+const rejectedRequestsTable = createRequestsTable('rejectedRequests', 'hasRejectedRequests')
 
 const requestsTabs = GovUKTabs({
   id: 'requests',
   items: [
     {
-      id: 'active-requests',
-      label: 'Active requests',
-      panel: { blocks: [activeRequestsTable] },
+      id: 'pending-requests-table',
+      label: 'Pending',
+      panel: { blocks: [pendingRequestsTable, noRequestsMessage('hasPendingRequests', 'pending')] },
     },
     {
-      id: 'history',
-      label: 'History',
-      panel: { blocks: [historyTable] },
+      id: 'approved-requests-table',
+      label: 'Approved',
+      panel: { blocks: [approvedRequestsTable, noRequestsMessage('hasApprovedRequests', 'approved')] },
+    },
+    {
+      id: 'rejected-requests-table',
+      label: 'Rejected',
+      panel: { blocks: [rejectedRequestsTable, noRequestsMessage('hasRejectedRequests', 'rejected')] },
     },
   ],
 })
@@ -92,7 +104,7 @@ const dashboardPage = GovUKGridRow({
     },
     {
       width: 'three-quarters',
-      blocks: [pageHeading, pageHeadingWithActionHub, submitButton, requestsTabs],
+      blocks: [pageHeading, actionButtons, requestsTabs],
     },
   ],
 })

@@ -5,3 +5,7 @@
 .govuk-template {
   background-color: govuk-colour("white");
 }
+
+.govuk-link:visited {
+  color: $govuk-link-colour;
+}
