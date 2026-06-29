@@ -1,6 +1,6 @@
 import { StatusDetails } from './types'
 
-const leaveRequestStatuses: Record<string, StatusDetails> = {
+export const leaveRequestStatuses: Record<string, StatusDetails> = {
   PENDING: {
     text: 'Pending',
     tagClass: 'govuk-tag--yellow',
@@ -15,4 +15,9 @@ const leaveRequestStatuses: Record<string, StatusDetails> = {
   },
 }
 
-export default leaveRequestStatuses
+export const annualLeaveUrls = {
+  login: '/login',
+  dashboard: `/requests/dashboard`,
+  viewUpdateUserRequest: `/requests/view-update`, // has '/id' at the end (leave request UUID)
+  deleteUserRequest: `/requests/delete`, // has '/id' at the end (leave request UUID)
+}

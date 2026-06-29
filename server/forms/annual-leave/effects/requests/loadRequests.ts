@@ -1,5 +1,5 @@
 import logger from '../../../../logger'
-import { formatLeaveRequest } from '../../helpers'
+import { formatLeaveRequestToTableRowSections } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const loadRequests = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -12,14 +12,15 @@ const loadRequests = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffec
   try {
     const { userRequests } = await deps.annualLeaveApiClient.getRequests(session.user.id)
 
+    context.setData('currentRequest', '')
     context.setData('userLeaveRequests', userRequests)
 
     const sorted = [...userRequests].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    const pendingRequests = sorted.filter(r => r.status === 'PENDING').map(formatLeaveRequest)
-    const approvedRequests = sorted.filter(r => r.status === 'APPROVED').map(formatLeaveRequest)
-    const rejectedRequests = sorted.filter(r => r.status === 'REJECTED').map(formatLeaveRequest)
+    const pendingRequests = sorted.filter(r => r.status === 'PENDING').map(formatLeaveRequestToTableRowSections)
+    const approvedRequests = sorted.filter(r => r.status === 'APPROVED').map(formatLeaveRequestToTableRowSections)
+    const rejectedRequests = sorted.filter(r => r.status === 'REJECTED').map(formatLeaveRequestToTableRowSections)
 
-    context.setData('loadRequestsError', false)
+    context.setData('loadUserRequestsError', false)
     context.setData('pendingRequests', pendingRequests)
     context.setData('approvedRequests', approvedRequests)
     context.setData('rejectedRequests', rejectedRequests)
@@ -31,7 +32,7 @@ const loadRequests = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffec
     const message = error instanceof Error ? error.message : 'Failed to fetch requests'
 
     logger.error({ userId: session.user.id }, `Load requests failed: ${message}`)
-    context.setData('loadRequestsError', true)
+    context.setData('loadUserRequestsError', true)
     context.setData('pendingRequests', [])
     context.setData('approvedRequests', [])
     context.setData('rejectedRequests', [])

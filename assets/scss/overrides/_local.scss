@@ -9,3 +9,11 @@
 .govuk-link:visited {
   color: $govuk-link-colour;
 }
+
+.govuk-button-group--spread {
+  justify-content: space-between;
+}
+
+.moj-messages-container {
+  border: none;
+}

@@ -24,7 +24,7 @@ export default step({
             when: Data('loginError').match(Condition.IsRequired()),
             goto: '/login',
           }),
-          redirect({ goto: '/dashboard' }),
+          redirect({ goto: '/requests' }),
         ],
       },
     }),

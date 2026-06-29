@@ -1,12 +1,12 @@
 import {
   escapeHtml,
   formatDate,
+  formatDateWithWeekday,
   formatDateTime,
   formatDuration,
-  formatHalfDayNote,
-  formatLeaveRequest,
+  formatLeaveRequestToTableRowSections,
 } from './helpers'
-import leaveRequestStatuses from './constants'
+import { annualLeaveUrls, leaveRequestStatuses } from './constants'
 import { AssignedLeaveRequestItem } from '../../interfaces/annualLeaveApi/response'
 
 describe('helpers', () => {
@@ -42,6 +42,16 @@ describe('helpers', () => {
     })
   })
 
+  describe('formatDateWithWeekday()', () => {
+    it('should format ISO date string with day of the week', () => {
+      expect(formatDateWithWeekday('2026-07-01')).toBe('Wednesday, 1 July 2026')
+    })
+
+    it('should format full ISO datetime string with day of the week', () => {
+      expect(formatDateWithWeekday('2026-12-25T10:00:00Z')).toBe('Friday, 25 December 2026')
+    })
+  })
+
   describe('formatDateTime()', () => {
     it('should format ISO datetime to readable date and time (24-hour format)', () => {
       expect(formatDateTime('2026-06-01T10:30:00Z')).toMatch(/1 June 2026 at \d{2}:\d{2}/)
@@ -49,6 +59,10 @@ describe('helpers', () => {
   })
 
   describe('formatDuration()', () => {
+    it('should return "Half day" when duration is 0.5', () => {
+      expect(formatDuration(0.5)).toBe('Half day')
+    })
+
     it('should return singular when duration is 1', () => {
       expect(formatDuration(1)).toBe('1 day')
     })
@@ -58,25 +72,7 @@ describe('helpers', () => {
     })
   })
 
-  describe('formatHalfDayNote()', () => {
-    it('should return both half days note when both are true', () => {
-      expect(formatHalfDayNote(true, true)).toBe('First and last day are half days.')
-    })
-
-    it('should return first day note when only first is half day', () => {
-      expect(formatHalfDayNote(true, false)).toBe('First day is a half day.')
-    })
-
-    it('should return last day note when only last is half day', () => {
-      expect(formatHalfDayNote(false, true)).toBe('Last day is a half day.')
-    })
-
-    it('should return empty string when neither is half day', () => {
-      expect(formatHalfDayNote(false, false)).toBe('')
-    })
-  })
-
-  describe('formatLeaveRequest()', () => {
+  describe('formatLeaveRequestToTableRowSections()', () => {
     const baseRequest: AssignedLeaveRequestItem = {
       id: 'req-1',
       createdAt: '2026-06-01T10:00:00Z',
@@ -95,7 +91,7 @@ describe('helpers', () => {
     }
 
     it('should format all fields correctly', () => {
-      const result = formatLeaveRequest(baseRequest)
+      const result = formatLeaveRequestToTableRowSections(baseRequest)
 
       expect(result.id).toBe('req-1')
       expect(result.duration).toBe('5 days')
@@ -105,7 +101,7 @@ describe('helpers', () => {
     })
 
     it('should render status tag with correct GOV.UK class for PENDING', () => {
-      const result = formatLeaveRequest(baseRequest)
+      const result = formatLeaveRequestToTableRowSections(baseRequest)
 
       expect(result.statusTag).toBe(
         `<strong class="govuk-tag ${leaveRequestStatuses.PENDING.tagClass}">${leaveRequestStatuses.PENDING.text}</strong>`,
@@ -113,7 +109,7 @@ describe('helpers', () => {
     })
 
     it('should render status tag with correct GOV.UK class for APPROVED', () => {
-      const result = formatLeaveRequest({ ...baseRequest, status: 'APPROVED' })
+      const result = formatLeaveRequestToTableRowSections({ ...baseRequest, status: 'APPROVED' })
 
       expect(result.statusTag).toBe(
         `<strong class="govuk-tag ${leaveRequestStatuses.APPROVED.tagClass}">${leaveRequestStatuses.APPROVED.text}</strong>`,
@@ -121,7 +117,7 @@ describe('helpers', () => {
     })
 
     it('should render status tag with correct GOV.UK class for REJECTED', () => {
-      const result = formatLeaveRequest({ ...baseRequest, status: 'REJECTED' })
+      const result = formatLeaveRequestToTableRowSections({ ...baseRequest, status: 'REJECTED' })
 
       expect(result.statusTag).toBe(
         `<strong class="govuk-tag ${leaveRequestStatuses.REJECTED.tagClass}">${leaveRequestStatuses.REJECTED.text}</strong>`,
@@ -129,9 +125,11 @@ describe('helpers', () => {
     })
 
     it('should render view link with request id', () => {
-      const result = formatLeaveRequest(baseRequest)
+      const result = formatLeaveRequestToTableRowSections(baseRequest)
 
-      expect(result.viewLink).toBe('<a href="/view-update-leave-request/req-1" class="govuk-link">View</a>')
+      expect(result.viewLink).toBe(
+        `<a href="${annualLeaveUrls.viewUpdateUserRequest}/req-1" class="govuk-link">View</a>`,
+      )
     })
   })
 })

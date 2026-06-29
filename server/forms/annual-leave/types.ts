@@ -3,7 +3,7 @@ export type StatusDetails = {
   tagClass: string
 }
 
-export interface FormattedToTableRowLeaveRequest {
+export interface FormattedLeaveRequestToTableRow {
   id: string
   duration: string
   startDate: string
@@ -11,4 +11,22 @@ export interface FormattedToTableRowLeaveRequest {
   requestedOn: string
   statusTag: string
   viewLink: string
+}
+
+export interface FormattedLeaveRequestToSummaryListItem {
+  requestId: string
+  startDate: string
+  endDate: string
+  duration: string
+  isFirstDayHalfDay: boolean
+  isLastDayHalfDay: boolean
+  requestedOn: string
+  requestedOnRaw: string
+  decisionAt: string
+  statusText: string
+  statusTagClass: string
+  decisionAtRaw: string
+  creatorNote: string
+  approverNote: string
+  status: string
 }

@@ -10,7 +10,7 @@ const managerDetails = GovUKDetails({
     .else("You haven't been assigned a manager"),
 })
 
-const sidebarStats = SidebarStats({
+const userSidebarStats = SidebarStats({
   heading: 'DAYS',
   entries: [
     { label: 'Balance', value: Data('actualBalance'), total: Data('annualEntitlement'), style: 'blue' },
@@ -20,12 +20,16 @@ const sidebarStats = SidebarStats({
   ],
 })
 
-const sidebarBlocks = [managerDetails, sidebarStats]
+const userSidebarBlocks = [userSidebarStats, managerDetails]
 
-export const sidebarLayout = (mainBlocks: BlockDefinition[]) =>
+const sidebarBlocksByLayout = {
+  userSidebar: userSidebarBlocks,
+}
+
+export const sidebarLayout = (mainBlocks: BlockDefinition[], layoutOption: keyof typeof sidebarBlocksByLayout) =>
   GovUKGridRow({
     columns: [
-      { width: 'one-quarter', blocks: sidebarBlocks },
+      { width: 'one-quarter', blocks: sidebarBlocksByLayout[layoutOption] },
       { width: 'three-quarters', blocks: mainBlocks },
     ],
   })

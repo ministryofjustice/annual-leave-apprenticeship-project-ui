@@ -9,14 +9,22 @@ import {
 import { escapeHtml } from '../helpers'
 
 export interface confirmModalParams {
+  // @Example "delete-user-leave-request-modal"
   modalId: string
+  // @Example "Delete request"
   openModalButtonText: string
+  // @Example "govuk-button--warning"
   openModalButtonStyle?: string
+  // @Example "Are you sure you want to delete this request?"
   heading: string
+  // @Example "Request for 1 day from Saturday, 18 July 2026 to Monday, 20 July 2026"
   description: string
   confirmHref: string
+  // Has default value "Yes, I'm sure", but can be overwritten
   confirmLabel?: string
+  // @Example "govuk-button--warning"
   confirmStyle?: string
+  // Has default value "No, cancel", but can be overwritten
   cancelLabel?: string
 }
 
@@ -33,7 +41,7 @@ export interface confirmModalProps extends BasicBlockProps {
 }
 
 export interface ConfirmModal extends BlockDefinition, confirmModalProps {
-  variant: 'confirmModal'
+  variant: 'ConfirmModal'
 }
 
 export const renderConfirmModalHtml = (params: confirmModalParams): string => {
@@ -63,11 +71,11 @@ export const renderConfirmModalHtml = (params: confirmModalParams): string => {
     </dialog>`
 }
 
-export const confirmModal = (props: confirmModalProps): ConfirmModal => {
-  return blockBuilder<ConfirmModal>({ ...props, variant: 'confirmModal' })
+export const ConfirmModal = (props: confirmModalProps): ConfirmModal => {
+  return blockBuilder<ConfirmModal>({ ...props, variant: 'ConfirmModal' })
 }
 
-export const confirmModalComponent = buildComponent<ConfirmModal>('confirmModal', block => {
+export const confirmModalComponent = buildComponent<ConfirmModal>('ConfirmModal', block => {
   return renderConfirmModalHtml({
     modalId: block.modalId as string,
     openModalButtonText: block.openModalButtonText as string,

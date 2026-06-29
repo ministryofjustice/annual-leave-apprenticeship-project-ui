@@ -42,7 +42,7 @@ export const sidebarStatsComponent = buildComponent<SidebarStats>('sidebarStats'
     .join('')
 
   return `
-    <div class="dashboard-stats">
+    <div class="dashboard-stats govuk-!-padding-bottom-5">
       <div class="dashboard-stats__card">
         <span class="govuk-heading-l govuk-!-margin-bottom-0">${block.heading}</span>
       </div>

@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
@@ -43,6 +42,10 @@ export default function nunjucksSetup(app: express.Express): nunjucks.Environmen
       noCache: process.env.NODE_ENV !== 'production',
     },
   )
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, global-require
+  const mojFilters = require('@ministryofjustice/frontend/moj/filters/all')()
+  njkEnv.addFilter('mojDate', mojFilters.mojDate)
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)

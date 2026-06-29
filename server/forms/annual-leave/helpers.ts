@@ -1,6 +1,6 @@
 import type { LeaveRequest } from '../../interfaces/annualLeaveApi/shared'
-import leaveRequestStatuses from './constants'
-import { FormattedToTableRowLeaveRequest } from './types'
+import { annualLeaveUrls, leaveRequestStatuses } from './constants'
+import { FormattedLeaveRequestToSummaryListItem, FormattedLeaveRequestToTableRow } from './types'
 
 export const escapeHtml = (str: string): string => {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -12,6 +12,12 @@ export const formatDate = (dateString: string): string => {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+export const formatDateWithWeekday = (dateString: string): string => {
+  const date = new Date(dateString)
+
+  return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 export const formatDateTime = (dateString: string): string => {
   const date = new Date(dateString)
   const datePart = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -21,26 +27,21 @@ export const formatDateTime = (dateString: string): string => {
 }
 
 export const formatDuration = (duration: number): string => {
-  return duration === 1 ? '1 day' : `${duration} days`
+  let durationText = ''
+  switch (duration) {
+    case 0.5:
+      durationText = 'Half day'
+      break
+    case 1:
+      durationText = '1 day'
+      break
+    default:
+      durationText = `${duration} days`
+  }
+  return durationText
 }
 
-export const formatHalfDayNote = (isFirstHalf: boolean, isLastHalf: boolean): string => {
-  if (isFirstHalf && isLastHalf) {
-    return 'First and last day are half days.'
-  }
-
-  if (isFirstHalf) {
-    return 'First day is a half day.'
-  }
-
-  if (isLastHalf) {
-    return 'Last day is a half day.'
-  }
-
-  return ''
-}
-
-export const formatLeaveRequest = (request: LeaveRequest): FormattedToTableRowLeaveRequest => {
+export const formatLeaveRequestToTableRowSections = (request: LeaveRequest): FormattedLeaveRequestToTableRow => {
   const status = leaveRequestStatuses[request.status]
 
   return {
@@ -50,6 +51,28 @@ export const formatLeaveRequest = (request: LeaveRequest): FormattedToTableRowLe
     endDate: formatDate(request.endDate),
     requestedOn: formatDateTime(request.createdAt),
     statusTag: `<strong class="govuk-tag ${status?.tagClass ?? ''}">${status?.text ?? request.status}</strong>`,
-    viewLink: `<a href="/view-update-leave-request/${request.id}" class="govuk-link">View</a>`,
+    viewLink: `<a href="${annualLeaveUrls.viewUpdateUserRequest}/${request.id}" class="govuk-link">View</a>`,
+  }
+}
+
+export const formatRequestDetails = (request: LeaveRequest): FormattedLeaveRequestToSummaryListItem => {
+  const status = leaveRequestStatuses[request.status]
+
+  return {
+    requestId: request.id,
+    startDate: formatDateWithWeekday(request.startDate),
+    endDate: formatDateWithWeekday(request.endDate),
+    duration: formatDuration(request.duration),
+    isFirstDayHalfDay: request.isFirstDayHalfDay,
+    isLastDayHalfDay: request.isLastDayHalfDay,
+    requestedOn: formatDateTime(request.createdAt),
+    requestedOnRaw: request.createdAt,
+    decisionAt: request.decisionAt ? formatDateTime(request.decisionAt) : '',
+    statusText: status?.text ?? request.status,
+    statusTagClass: status?.tagClass ?? '',
+    decisionAtRaw: request.decisionAt ?? '',
+    creatorNote: request.creatorNote,
+    approverNote: request.approverNote ?? '',
+    status: request.status,
   }
 }

@@ -8,11 +8,12 @@ import {
   GovUKTabs,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { fullWidthLayout, sidebarLayout } from '../../../../sharedBlocks'
-import { isLoadRequestError } from '../../../../guards'
+import { isLoadUserRequestError, isLoadUserRequestsError } from '../../../../guards'
 
 const pageHeading = GovUKHeading({
   text: 'Dashboard',
   size: 'xl',
+  classes: 'govuk-!-margin-bottom-6',
 })
 
 const managerHubLinkButton = GovUKLinkButton({
@@ -29,7 +30,8 @@ const submitNewRequestLinkButton = GovUKLinkButton({
 })
 
 const actionButtons = GovUKButtonGroup({
-  buttons: [managerHubLinkButton, submitNewRequestLinkButton],
+  buttons: [submitNewRequestLinkButton, managerHubLinkButton],
+  classes: 'govuk-button-group--spread',
 })
 
 const noRequestsMessage = (hasDataKey: string, requestStatus: string) =>
@@ -100,9 +102,9 @@ const errorActionSuggestion = GovUKBody({
 })
 
 const dashboardErrorPage = fullWidthLayout([errorHeading, errorReason, errorActionSuggestion])
-dashboardErrorPage.visibleWhen = isLoadRequestError
+dashboardErrorPage.visibleWhen = isLoadUserRequestsError
 
-const dashboardPage = sidebarLayout([pageHeading, actionButtons, requestsTabs])
-dashboardPage.visibleWhen = not(isLoadRequestError)
+const dashboardPage = sidebarLayout([pageHeading, actionButtons, requestsTabs], 'userSidebar')
+dashboardPage.visibleWhen = not(isLoadUserRequestError)
 
 export default [dashboardErrorPage, dashboardPage]
