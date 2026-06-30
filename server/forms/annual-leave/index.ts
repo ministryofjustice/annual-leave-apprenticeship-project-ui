@@ -10,7 +10,12 @@ const annualLeaveRootJourney = journey({
   code: 'annual-leave',
   title: 'Annual Leave App',
   path: '/',
-  view: { template: 'annual-leave/views/annual-leave-step' },
+  view: {
+    template: 'annual-leave/views/annual-leave-step',
+    locals: {
+      hmppsHeaderServiceNameLink: '/requests/dashboard',
+    },
+  },
   children: [loginJourney, leaveRequestManagementJourney],
 })
 

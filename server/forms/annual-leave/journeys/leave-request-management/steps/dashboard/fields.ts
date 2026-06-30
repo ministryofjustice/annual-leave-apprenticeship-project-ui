@@ -4,8 +4,10 @@ import {
   GovUKButtonGroup,
   GovUKHeading,
   GovUKLinkButton,
+  GovUKNotificationBanner,
   GovUKTable,
   GovUKTabs,
+  GovUKWarningText,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { fullWidthLayout, sidebarLayout } from '../../../../sharedBlocks'
 import { isLoadUserRequestError, isLoadUserRequestsError } from '../../../../guards'
@@ -14,6 +16,17 @@ const pageHeading = GovUKHeading({
   text: 'Dashboard',
   size: 'xl',
   classes: 'govuk-!-margin-bottom-6',
+})
+
+const deleteSuccessBanner = GovUKNotificationBanner({
+  bannerType: 'success',
+  text: Data('deleteRequestSuccess'),
+  visibleWhen: Data('deleteRequestSuccess').match(Condition.IsRequired()),
+})
+
+const deleteErrorBanner = GovUKWarningText({
+  text: Data('deleteRequestError'),
+  visibleWhen: Data('deleteRequestError').match(Condition.IsRequired()),
 })
 
 const managerHubLinkButton = GovUKLinkButton({
@@ -104,7 +117,10 @@ const errorActionSuggestion = GovUKBody({
 const dashboardErrorPage = fullWidthLayout([errorHeading, errorReason, errorActionSuggestion])
 dashboardErrorPage.visibleWhen = isLoadUserRequestsError
 
-const dashboardPage = sidebarLayout([pageHeading, actionButtons, requestsTabs], 'userSidebar')
+const dashboardPage = sidebarLayout(
+  [pageHeading, actionButtons, deleteSuccessBanner, deleteErrorBanner, requestsTabs],
+  'userSidebar',
+)
 dashboardPage.visibleWhen = not(isLoadUserRequestError)
 
 export default [dashboardErrorPage, dashboardPage]

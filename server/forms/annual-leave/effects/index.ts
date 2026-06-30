@@ -6,6 +6,8 @@ import loadUserFromSession from './auth/loadUserFromSession'
 import loadRequests from './requests/loadRequests'
 import loadRequest from './requests/loadRequest'
 import loadBalance from './requests/loadBalance'
+import deleteRequest from './requests/deleteRequest'
+import loadDeleteNotification from './requests/loadDeleteNotification'
 
 interface AnnualLeaveEffectShape {
   authenticateUser: () => EffectFunctionExpr
@@ -14,6 +16,8 @@ interface AnnualLeaveEffectShape {
   loadRequests: () => EffectFunctionExpr
   loadRequest: () => EffectFunctionExpr
   loadBalance: () => EffectFunctionExpr
+  deleteRequest: () => EffectFunctionExpr
+  loadDeleteNotification: () => EffectFunctionExpr
 }
 
 export const { effects: AnnualLeaveEffects, implementations: annualLeaveEffectImplementations } = defineEffectFunctions<
@@ -26,6 +30,8 @@ export const { effects: AnnualLeaveEffects, implementations: annualLeaveEffectIm
   loadRequests,
   loadRequest,
   loadBalance,
+  deleteRequest,
+  loadDeleteNotification,
 })
 
 export default annualLeaveEffectImplementations

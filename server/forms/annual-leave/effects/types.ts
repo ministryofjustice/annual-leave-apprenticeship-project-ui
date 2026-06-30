@@ -12,6 +12,8 @@ export interface AnnualLeaveDeps {
 export interface AnnualLeaveSession extends Session {
   user?: LoginResponse
   loginError?: string
+  deleteRequestSuccess?: string
+  deleteRequestError?: string
 }
 
 export type AnnualLeaveData = Record<string, unknown>

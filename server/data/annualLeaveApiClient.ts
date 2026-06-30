@@ -22,6 +22,13 @@ export default class AnnualLeaveApiClient extends RestClient {
     })
   }
 
+  async deleteRequest(userId: string, requestId: string): Promise<void> {
+    return this.delete({
+      path: `/requests/${requestId}`,
+      headers: { 'X-User-Id': userId },
+    })
+  }
+
   async getBalance(userId: string): Promise<BalanceResponse> {
     return this.get({
       path: '/balance',

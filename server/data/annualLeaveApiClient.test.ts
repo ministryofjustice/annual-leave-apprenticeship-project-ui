@@ -22,6 +22,7 @@ describe('AnnualLeaveApiClient', () => {
   let client: AnnualLeaveApiClient
   let mockPost: jest.SpyInstance
   let mockGet: jest.SpyInstance
+  let mockDelete: jest.SpyInstance
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -29,6 +30,7 @@ describe('AnnualLeaveApiClient', () => {
     client = new AnnualLeaveApiClient()
     mockPost = jest.spyOn(client as unknown as { post: jest.Mock }, 'post')
     mockGet = jest.spyOn(client as unknown as { get: jest.Mock }, 'get')
+    mockDelete = jest.spyOn(client as unknown as { delete: jest.Mock }, 'delete')
   })
 
   describe('login()', () => {
@@ -127,6 +129,25 @@ describe('AnnualLeaveApiClient', () => {
       mockGet.mockRejectedValue(new Error('Failed to fetch balance'))
 
       await expect(client.getBalance('user-123')).rejects.toThrow('Failed to fetch balance')
+    })
+  })
+
+  describe('deleteRequest()', () => {
+    it('should send delete request with user ID header', async () => {
+      mockDelete.mockResolvedValue(undefined)
+
+      await client.deleteRequest('user-123', 'req-1')
+
+      expect(mockDelete).toHaveBeenCalledWith({
+        path: '/requests/req-1',
+        headers: { 'X-User-Id': 'user-123' },
+      })
+    })
+
+    it('should propagate errors', async () => {
+      mockDelete.mockRejectedValue(new Error('Failed to delete request'))
+
+      await expect(client.deleteRequest('user-123', 'req-1')).rejects.toThrow('Failed to delete request')
     })
   })
 })
