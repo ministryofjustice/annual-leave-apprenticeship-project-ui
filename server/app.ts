@@ -53,8 +53,14 @@ export default function createApp(services: Services): express.Application {
   // app.use(setUpCurrentUser())
   app.use(setUpCsrf())
 
+  // Lazy getter so templates read the session value at render time,
+  // after Forge onAccess effects have had a chance to set it
   app.use((req, res, next) => {
-    res.locals.sessionUser = req.session?.user
+    Object.defineProperty(res.locals, 'sessionUser', {
+      get: () => req.session?.user,
+      enumerable: true,
+      configurable: true,
+    })
     next()
   })
 
