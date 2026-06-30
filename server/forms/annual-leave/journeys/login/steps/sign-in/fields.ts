@@ -1,6 +1,7 @@
 import { Condition, Data, Self, validation } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
   GovUKButton,
+  GovUKGridRow,
   GovUKHeading,
   GovUKPasswordInput,
   GovUKTextInput,
@@ -9,11 +10,15 @@ import { MOJAlert } from '@ministryofjustice/hmpps-forge/moj-components'
 
 export const heading = GovUKHeading({ text: 'Sign in', size: 'l' })
 
-export const errorAlert = MOJAlert({
+const errorAlertBlock = MOJAlert({
   alertVariant: 'error',
   title: 'There is a problem',
   text: Data('loginError'),
   visibleWhen: Data('loginError').match(Condition.IsRequired()),
+})
+
+export const errorAlert = GovUKGridRow({
+  columns: [{ width: 'three-quarters', blocks: [errorAlertBlock] }],
 })
 
 export const emailField = GovUKTextInput({
