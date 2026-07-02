@@ -8,7 +8,7 @@ const authenticateUser = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveE
   const session = context.getSession()
 
   try {
-    session.user = await deps.annualLeaveApiClient.login(email, password)
+    session.user = await deps.annualLeaveApiClient.login({ email, password })
     delete session.loginError
   } catch (error) {
     const fallbackError = 'Something went wrong while signing in. Please try again later'

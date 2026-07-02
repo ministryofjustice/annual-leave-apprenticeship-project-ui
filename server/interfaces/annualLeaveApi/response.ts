@@ -1,6 +1,6 @@
 import { LeaveRequest } from './shared'
 
-export interface LoginResponse {
+export interface LoginRes {
   id: string
   firstName: string
   lastName: string
@@ -14,11 +14,11 @@ export interface AssignedLeaveRequestItem extends LeaveRequest {
   creatorName: string
 }
 
-export interface RequestsResponse {
+export interface UserLeaveRequestsRes {
   userRequests: LeaveRequest[]
 }
 
-export interface BalanceResponse {
+export interface BalanceRes {
   annualEntitlement: number
   availableBalance: number
   actualBalance: number

@@ -1,24 +1,35 @@
 import { RestClient } from '@ministryofjustice/hmpps-rest-client'
 import config from '../config'
 import logger from '../logger'
-import { BalanceResponse, LoginResponse, RequestsResponse } from '../interfaces/annualLeaveApi/response'
+import { BalanceRes, LoginRes, UserLeaveRequestsRes } from '../interfaces/annualLeaveApi/response'
+import { LeaveRequest } from '../interfaces/annualLeaveApi/shared'
+import { CreateLeaveRequestReq, LoginReq } from '../interfaces/annualLeaveApi/request'
 
 export default class AnnualLeaveApiClient extends RestClient {
   constructor() {
     super('Annual Leave API', config.apis.annualLeaveApi, logger)
   }
 
-  async login(email: string, password: string): Promise<LoginResponse> {
+  async login(credentials: LoginReq): Promise<LoginRes> {
+    const { email, password } = credentials
     return this.post({
       path: '/auth/login',
       data: { email, password },
     })
   }
 
-  async getRequests(userId: string): Promise<RequestsResponse> {
+  async getRequests(userId: string): Promise<UserLeaveRequestsRes> {
     return this.get({
       path: '/requests',
       headers: { 'X-User-Id': userId },
+    })
+  }
+
+  async createRequest(userId: string, request: CreateLeaveRequestReq): Promise<LeaveRequest> {
+    return this.post({
+      path: '/requests',
+      headers: { 'X-User-Id': userId },
+      data: { ...request },
     })
   }
 
@@ -29,7 +40,7 @@ export default class AnnualLeaveApiClient extends RestClient {
     })
   }
 
-  async getBalance(userId: string): Promise<BalanceResponse> {
+  async getBalance(userId: string): Promise<BalanceRes> {
     return this.get({
       path: '/balance',
       headers: { 'X-User-Id': userId },

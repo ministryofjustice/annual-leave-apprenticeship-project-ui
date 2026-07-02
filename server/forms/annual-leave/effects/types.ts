@@ -2,7 +2,7 @@ import type { EffectFunctionContext } from '@ministryofjustice/hmpps-forge/core/
 import type { Session } from 'express-session'
 import type AuditService from '../../../services/auditService'
 import type AnnualLeaveApiClient from '../../../data/annualLeaveApiClient'
-import { LoginResponse } from '../../../interfaces/annualLeaveApi/response'
+import { LoginRes } from '../../../interfaces/annualLeaveApi/response'
 
 export interface AnnualLeaveDeps {
   auditService: AuditService
@@ -10,10 +10,12 @@ export interface AnnualLeaveDeps {
 }
 
 export interface AnnualLeaveSession extends Session {
-  user?: LoginResponse
+  user?: LoginRes
   loginError?: string
   deleteRequestSuccess?: string
   deleteRequestError?: string
+  createRequestSuccess?: string
+  createRequestError?: string
 }
 
 export type AnnualLeaveData = Record<string, unknown>
@@ -21,6 +23,11 @@ export type AnnualLeaveData = Record<string, unknown>
 export interface AnnualLeaveAnswers extends Record<string, unknown> {
   email: string
   password: string
+  startDate: string
+  endDate: string
+  isFirstDayHalfDay: string[]
+  isLastDayHalfDay: string[]
+  creatorNote: string
 }
 
 export type AnnualLeaveRequestState = Record<string, unknown>

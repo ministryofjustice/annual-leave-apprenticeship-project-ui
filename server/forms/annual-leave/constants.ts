@@ -20,4 +20,5 @@ export const annualLeaveUrls = {
   dashboard: `/requests/dashboard`,
   viewUpdateUserRequest: `/requests/view-update`, // has '/id' at the end (leave request UUID)
   deleteUserRequest: `/requests/delete`, // has '/id' at the end (leave request UUID)
+  createRequest: `/requests/create`,
 }

@@ -7,7 +7,7 @@ import {
   formatLeaveRequestToTableRowSections,
 } from './helpers'
 import { annualLeaveUrls, leaveRequestStatuses } from './constants'
-import { AssignedLeaveRequestItem } from '../../interfaces/annualLeaveApi/response'
+import { LeaveRequest } from '../../interfaces/annualLeaveApi/shared'
 
 describe('helpers', () => {
   describe('escapeHtml()', () => {
@@ -73,7 +73,7 @@ describe('helpers', () => {
   })
 
   describe('formatLeaveRequestToTableRowSections()', () => {
-    const baseRequest: AssignedLeaveRequestItem = {
+    const baseRequest: LeaveRequest = {
       id: 'req-1',
       createdAt: '2026-06-01T10:00:00Z',
       decisionAt: null,
@@ -87,7 +87,6 @@ describe('helpers', () => {
       status: 'PENDING',
       creatorNote: 'Holiday',
       approverNote: null,
-      creatorName: 'User Userovich',
     }
 
     it('should format all fields correctly', () => {

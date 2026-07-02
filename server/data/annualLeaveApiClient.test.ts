@@ -1,5 +1,7 @@
 import AnnualLeaveApiClient from './annualLeaveApiClient'
-import type { BalanceResponse, LoginResponse, RequestsResponse } from '../interfaces/annualLeaveApi/response'
+import type { BalanceRes, LoginRes, UserLeaveRequestsRes } from '../interfaces/annualLeaveApi/response'
+import type { CreateLeaveRequestReq } from '../interfaces/annualLeaveApi/request'
+import type { LeaveRequest } from '../interfaces/annualLeaveApi/shared'
 
 jest.mock('../config', () => ({
   apis: {
@@ -35,7 +37,7 @@ describe('AnnualLeaveApiClient', () => {
 
   describe('login()', () => {
     it('should send credentials to auth endpoint', async () => {
-      const expectedResponse: LoginResponse = {
+      const expectedResponse: LoginRes = {
         id: 'user-123',
         firstName: 'Alice',
         lastName: 'Smith',
@@ -48,7 +50,7 @@ describe('AnnualLeaveApiClient', () => {
 
       mockPost.mockResolvedValue(expectedResponse)
 
-      const result = await client.login('alice@example.com', 'password')
+      const result = await client.login({ email: 'alice@example.com', password: 'password' })
 
       expect(result).toEqual(expectedResponse)
       expect(mockPost).toHaveBeenCalledWith({
@@ -60,13 +62,13 @@ describe('AnnualLeaveApiClient', () => {
     it('should propagate errors', async () => {
       mockPost.mockRejectedValue(new Error('Login failed'))
 
-      await expect(client.login('alice@example.com', 'wrong')).rejects.toThrow('Login failed')
+      await expect(client.login({ email: 'alice@example.com', password: 'wrong' })).rejects.toThrow('Login failed')
     })
   })
 
   describe('getRequests()', () => {
     it('should fetch requests with user ID header', async () => {
-      const expectedResponse: RequestsResponse = {
+      const expectedResponse: UserLeaveRequestsRes = {
         userRequests: [
           {
             id: 'req-1',
@@ -75,8 +77,8 @@ describe('AnnualLeaveApiClient', () => {
             creatorId: 'user-123',
             approverId: 'manager-456',
             startDate: '2026-07-01',
-            endDate: '2026-07-05',
-            duration: 5,
+            endDate: '2026-07-03',
+            duration: 3,
             isFirstDayHalfDay: false,
             isLastDayHalfDay: false,
             status: 'PENDING',
@@ -106,7 +108,7 @@ describe('AnnualLeaveApiClient', () => {
 
   describe('getBalance()', () => {
     it('should fetch balance with user ID header', async () => {
-      const expectedResponse: BalanceResponse = {
+      const expectedResponse: BalanceRes = {
         annualEntitlement: 25,
         availableBalance: 20,
         actualBalance: 22,
@@ -129,6 +131,59 @@ describe('AnnualLeaveApiClient', () => {
       mockGet.mockRejectedValue(new Error('Failed to fetch balance'))
 
       await expect(client.getBalance('user-123')).rejects.toThrow('Failed to fetch balance')
+    })
+  })
+
+  describe('createRequest()', () => {
+    it('should send request data with user ID header', async () => {
+      const requestData: CreateLeaveRequestReq = {
+        startDate: '2026-07-14',
+        endDate: '2026-07-17',
+        isFirstDayHalfDay: false,
+        isLastDayHalfDay: true,
+        creatorNote: 'Summer holiday',
+      }
+
+      const expectedResponse: LeaveRequest = {
+        id: 'req-new',
+        createdAt: '2026-07-01T10:00:00Z',
+        decisionAt: null,
+        creatorId: 'user-123',
+        approverId: 'manager-456',
+        startDate: '2026-07-14',
+        endDate: '2026-07-17',
+        duration: 3.5,
+        isFirstDayHalfDay: false,
+        isLastDayHalfDay: true,
+        status: 'PENDING',
+        creatorNote: 'Summer holiday',
+        approverNote: null,
+      }
+
+      mockPost.mockResolvedValue(expectedResponse)
+
+      const result = await client.createRequest('user-123', requestData)
+
+      expect(result).toEqual(expectedResponse)
+      expect(mockPost).toHaveBeenCalledWith({
+        path: '/requests',
+        headers: { 'X-User-Id': 'user-123' },
+        data: requestData,
+      })
+    })
+
+    it('should propagate errors', async () => {
+      mockPost.mockRejectedValue(new Error('Failed to create request'))
+
+      await expect(
+        client.createRequest('user-123', {
+          startDate: '2026-07-14',
+          endDate: '2026-07-17',
+          isFirstDayHalfDay: false,
+          isLastDayHalfDay: false,
+          creatorNote: null,
+        }),
+      ).rejects.toThrow('Failed to create request')
     })
   })
 
