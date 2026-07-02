@@ -10,7 +10,7 @@ import {
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { MOJTimeline } from '@ministryofjustice/hmpps-forge/moj-components'
-import { sidebarLayout, fullWidthLayout } from '../../../../sharedBlocks'
+import { userSidebar } from '../../../../sharedBlocks'
 import { isLoadUserRequestError } from '../../../../guards'
 import { annualLeaveUrls } from '../../../../constants'
 import { ConfirmModal } from '../../../../components/confirmModal'
@@ -137,13 +137,15 @@ const errorBody = GovUKBody({
   text: 'We could not find the leave request you are looking for. It may have been removed or the link is incorrect.',
 })
 
-const errorPage = fullWidthLayout([errorHeading, errorBody, backButton])
+const errorPage = HtmlBlock({ content: [errorHeading, errorBody, backButton] })
 errorPage.visibleWhen = isLoadUserRequestError
 
-const requestPage = sidebarLayout(
-  [headingWithTag, summaryListRow, requestTimeline, sectionBreak, actionButtons],
-  'userSidebar',
-)
-requestPage.visibleWhen = not(isLoadUserRequestError)
+const sidebar = userSidebar
+sidebar.visibleWhen = not(isLoadUserRequestError)
 
-export default [errorPage, requestPage]
+const requestContent = HtmlBlock({
+  content: [headingWithTag, summaryListRow, requestTimeline, sectionBreak, actionButtons],
+})
+requestContent.visibleWhen = not(isLoadUserRequestError)
+
+export default [sidebar, errorPage, requestContent]

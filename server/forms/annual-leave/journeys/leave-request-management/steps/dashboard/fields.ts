@@ -9,7 +9,8 @@ import {
   GovUKTabs,
   GovUKWarningText,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
-import { fullWidthLayout, sidebarLayout } from '../../../../sharedBlocks'
+import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
+import { userSidebar } from '../../../../sharedBlocks'
 import { isLoadUserRequestError, isLoadUserRequestsError } from '../../../../guards'
 
 const pageHeading = GovUKHeading({
@@ -114,13 +115,15 @@ const errorActionSuggestion = GovUKBody({
   text: 'Try reloading the page. You can do this by pressing F5 (on a PC), or Cmd + R (on a Mac).',
 })
 
-const dashboardErrorPage = fullWidthLayout([errorHeading, errorReason, errorActionSuggestion])
+const dashboardErrorPage = HtmlBlock({ content: [errorHeading, errorReason, errorActionSuggestion] })
 dashboardErrorPage.visibleWhen = isLoadUserRequestsError
 
-const dashboardPage = sidebarLayout(
-  [pageHeading, actionButtons, deleteSuccessBanner, deleteErrorBanner, requestsTabs],
-  'userSidebar',
-)
-dashboardPage.visibleWhen = not(isLoadUserRequestError)
+const sidebar = userSidebar
+sidebar.visibleWhen = not(isLoadUserRequestError)
 
-export default [dashboardErrorPage, dashboardPage]
+const dashboardContent = HtmlBlock({
+  content: [pageHeading, actionButtons, deleteSuccessBanner, deleteErrorBanner, requestsTabs],
+})
+dashboardContent.visibleWhen = not(isLoadUserRequestError)
+
+export default [sidebar, dashboardErrorPage, dashboardContent]

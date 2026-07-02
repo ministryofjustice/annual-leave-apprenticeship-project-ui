@@ -1,6 +1,6 @@
 import { Condition, Data, when } from '@ministryofjustice/hmpps-forge/core/authoring'
-import { GovUKDetails, GovUKGridRow } from '@ministryofjustice/hmpps-forge/govuk-components'
-import type { BlockDefinition } from '@ministryofjustice/hmpps-forge/core/components'
+import { GovUKDetails } from '@ministryofjustice/hmpps-forge/govuk-components'
+import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { SidebarStats } from './components/sidebarStats'
 
 const managerDetails = GovUKDetails({
@@ -20,21 +20,4 @@ const userSidebarStats = SidebarStats({
   ],
 })
 
-const userSidebarBlocks = [userSidebarStats, managerDetails]
-
-const sidebarBlocksByLayout = {
-  userSidebar: userSidebarBlocks,
-}
-
-export const sidebarLayout = (mainBlocks: BlockDefinition[], layoutOption: keyof typeof sidebarBlocksByLayout) =>
-  GovUKGridRow({
-    columns: [
-      { width: 'one-quarter', blocks: sidebarBlocksByLayout[layoutOption] },
-      { width: 'three-quarters', blocks: mainBlocks },
-    ],
-  })
-
-export const fullWidthLayout = (mainBlocks: BlockDefinition[]) =>
-  GovUKGridRow({
-    columns: [{ width: 'full', blocks: mainBlocks }],
-  })
+export const userSidebar = HtmlBlock({ content: [userSidebarStats, managerDetails] })

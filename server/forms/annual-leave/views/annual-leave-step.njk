@@ -10,18 +10,36 @@
 {% endset %}
 
 {% block content %}
-  {% if fieldValidationErrors | length %}
-    {{ govukErrorSummary({
-      titleText: "There is a problem",
-      errorList: fieldValidationErrors | toErrorSummary
-    }) }}
-  {% endif %}
+  {% set sidebarIndex = twoColumnLayout.sidebarBlockIndex if twoColumnLayout else -1 %}
 
   <form id="main-form" method="post" novalidate>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-    {% for block in blocks %}
-      {{ block | safe }}
-    {% endfor %}
+    {% if twoColumnLayout %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+          {{ blocks[sidebarIndex] | safe }}
+        </div>
+        <div class="govuk-grid-column-three-quarters">
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: fieldValidationErrors | toErrorSummary
+          }) if fieldValidationErrors | length }}
+
+          {% for block in blocks %}
+            {{ block | safe if loop.index0 != sidebarIndex }}
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: fieldValidationErrors | toErrorSummary
+      }) if fieldValidationErrors | length }}
+
+      {% for block in blocks %}
+        {{ block | safe }}
+      {% endfor %}
+    {% endif %}
   </form>
 {% endblock %}

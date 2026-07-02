@@ -7,6 +7,11 @@ export default step({
   path: '/view-update/:id',
   title: 'Request Details',
   reachability: { entryWhen: true },
+  view: {
+    locals: {
+      twoColumnLayout: { sidebarBlockIndex: 0 },
+    },
+  },
   blocks: viewUpdateBlocks,
   onAccess: [
     redirectToDashboardIfErrorLoadingUserRequests(),

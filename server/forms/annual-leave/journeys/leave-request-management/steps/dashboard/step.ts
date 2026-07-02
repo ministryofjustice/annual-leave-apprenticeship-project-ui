@@ -5,5 +5,10 @@ export const dashboardStep = step({
   path: '/dashboard',
   title: 'Dashboard',
   reachability: { entryWhen: true },
+  view: {
+    locals: {
+      twoColumnLayout: { sidebarBlockIndex: 0 },
+    },
+  },
   blocks: dashboardBlocks,
 })
