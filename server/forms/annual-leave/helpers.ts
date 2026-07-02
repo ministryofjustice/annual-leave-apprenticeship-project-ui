@@ -26,6 +26,20 @@ export const formatDateTime = (dateString: string): string => {
   return `${datePart} at ${timePart}`
 }
 
+export const isValidIsoDate = (value: string): boolean => {
+  const date = new Date(value)
+
+  return !Number.isNaN(date.getTime())
+}
+export const isPastDate = (value: string): boolean => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  return new Date(value) < today
+}
+export const datesOverlap = (startA: Date, endA: Date, startB: Date, endB: Date): boolean =>
+  startA <= endB && endA >= startB
+
 export const formatDuration = (duration: number): string => {
   let durationText = ''
   switch (duration) {
