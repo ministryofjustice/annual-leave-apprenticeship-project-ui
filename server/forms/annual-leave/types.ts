@@ -5,6 +5,7 @@ export type StatusDetails = {
 
 export interface FormattedLeaveRequestToTableRow {
   id: string
+  creatorName?: string
   duration: string
   startDate: string
   endDate: string

@@ -1,3 +1,4 @@
+import type { AssignedLeaveRequestItem } from '../../interfaces/annualLeaveApi/response'
 import type { LeaveRequest } from '../../interfaces/annualLeaveApi/shared'
 import { annualLeaveUrls, leaveRequestStatuses } from './constants'
 import { FormattedLeaveRequestToSummaryListItem, FormattedLeaveRequestToTableRow } from './types'
@@ -55,17 +56,24 @@ export const formatDuration = (duration: number): string => {
   return durationText
 }
 
-export const formatLeaveRequestToTableRowSections = (request: LeaveRequest): FormattedLeaveRequestToTableRow => {
+const isAssignedRequest = (request: LeaveRequest): request is AssignedLeaveRequestItem => 'creatorName' in request
+
+export const formatLeaveRequestToTableRowSections = (
+  request: LeaveRequest | AssignedLeaveRequestItem,
+): FormattedLeaveRequestToTableRow => {
   const status = leaveRequestStatuses[request.status]
+  const isAssigned = isAssignedRequest(request)
+  const viewUrl = isAssigned ? annualLeaveUrls.viewAssignedRequest : annualLeaveUrls.viewUpdateUserRequest
 
   return {
     id: request.id,
+    ...(isAssigned && { creatorName: escapeHtml(request.creatorName) }),
     duration: formatDuration(request.duration),
     startDate: formatDate(request.startDate),
     endDate: formatDate(request.endDate),
     requestedOn: formatDateTime(request.createdAt),
     statusTag: `<strong class="govuk-tag ${status?.tagClass ?? ''}">${status?.text ?? request.status}</strong>`,
-    viewLink: `<a href="${annualLeaveUrls.viewUpdateUserRequest}/${request.id}" class="govuk-link">View</a>`,
+    viewLink: `<a href="${viewUrl}/${request.id}" class="govuk-link">View</a>`,
   }
 }
 
