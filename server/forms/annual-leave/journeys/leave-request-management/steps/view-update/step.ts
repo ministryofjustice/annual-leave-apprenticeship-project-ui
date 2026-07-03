@@ -1,7 +1,10 @@
 import { access, step } from '@ministryofjustice/hmpps-forge/core/authoring'
 import { AnnualLeaveEffects } from '../../../../effects'
 import viewUpdateBlocks from './fields'
-import { redirectToDashboardIfErrorLoadingUserRequests } from '../../../../guards'
+import {
+  redirectToDashboardIfErrorLoadingBalance,
+  redirectToDashboardIfErrorLoadingUserRequests,
+} from '../../../../guards'
 
 export default step({
   path: '/view-update/:id',
@@ -15,6 +18,7 @@ export default step({
   blocks: viewUpdateBlocks,
   onAccess: [
     redirectToDashboardIfErrorLoadingUserRequests(),
+    redirectToDashboardIfErrorLoadingBalance(),
     access({
       effects: [AnnualLeaveEffects.loadRequest()],
     }),

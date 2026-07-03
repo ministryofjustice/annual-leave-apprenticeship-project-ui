@@ -11,7 +11,7 @@ import {
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { userSidebar } from '../../../../sharedBlocks'
-import { isLoadUserRequestError, isLoadUserRequestsError } from '../../../../guards'
+import { hasDataLoadError } from '../../../../guards'
 import { annualLeaveUrls } from '../../../../constants'
 
 const pageHeading = GovUKHeading({
@@ -35,7 +35,7 @@ const errorActionSuggestion = GovUKBody({
 })
 
 const dashboardErrorPage = HtmlBlock({ content: [errorHeading, errorReason, errorActionSuggestion] })
-dashboardErrorPage.visibleWhen = isLoadUserRequestsError
+dashboardErrorPage.visibleWhen = hasDataLoadError
 
 // banners (for view-update and create request pages):
 const deleteSuccessBanner = GovUKNotificationBanner({
@@ -143,11 +143,11 @@ const requestsTabs = GovUKTabs({
 })
 
 const sidebar = userSidebar
-sidebar.visibleWhen = not(isLoadUserRequestError)
+sidebar.visibleWhen = not(hasDataLoadError)
 
 const dashboardContent = HtmlBlock({
   content: [pageHeading, actionButtons, errorBanners, successBanners, requestsTabs],
 })
-dashboardContent.visibleWhen = not(isLoadUserRequestError)
+dashboardContent.visibleWhen = not(hasDataLoadError)
 
 export default [sidebar, dashboardErrorPage, dashboardContent]

@@ -1,6 +1,7 @@
-import { access, step } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { access, step, when } from '@ministryofjustice/hmpps-forge/core/authoring'
 import dashboardBlocks from './fields'
 import { AnnualLeaveEffects } from '../../../../effects'
+import { hasDataLoadError } from '../../../../guards'
 
 export const dashboardStep = step({
   path: '/dashboard',
@@ -8,7 +9,7 @@ export const dashboardStep = step({
   reachability: { entryWhen: true },
   view: {
     locals: {
-      twoColumnLayout: { sidebarBlockIndex: 0 },
+      twoColumnLayout: when(hasDataLoadError).then('').else({ sidebarBlockIndex: 0 }),
     },
   },
   onAccess: [

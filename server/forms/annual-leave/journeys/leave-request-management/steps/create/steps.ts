@@ -2,6 +2,7 @@ import { Condition, Data, redirect, step, submit } from '@ministryofjustice/hmpp
 import { AnnualLeaveEffects } from '../../../../effects'
 import { annualLeaveUrls } from '../../../../constants'
 import createRequestBlocks from './fields'
+import { redirectToDashboardIfErrorLoadingBalance } from '../../../../guards'
 
 export default step({
   path: '/create',
@@ -13,6 +14,7 @@ export default step({
     },
   },
   blocks: createRequestBlocks,
+  onAccess: [redirectToDashboardIfErrorLoadingBalance()],
   onSubmission: [
     submit({
       validate: true,
