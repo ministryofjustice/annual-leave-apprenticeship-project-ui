@@ -11,6 +11,7 @@ import {
   isValidIsoDate,
 } from './helpers'
 import { annualLeaveUrls, leaveRequestStatuses } from './constants'
+import { AssignedLeaveRequestItem } from '../../interfaces/annualLeaveApi/response'
 import { LeaveRequest } from '../../interfaces/annualLeaveApi/shared'
 
 describe('helpers', () => {
@@ -133,6 +134,33 @@ describe('helpers', () => {
       expect(result.viewLink).toBe(
         `<a href="${annualLeaveUrls.viewUpdateUserRequest}/req-1" class="govuk-link">View</a>`,
       )
+    })
+
+    it('should not include creatorName for regular leave request', () => {
+      const result = formatLeaveRequestToTableRowSections(baseRequest)
+
+      expect(result.creatorName).toBeUndefined()
+    })
+
+    it('should include escaped creatorName for assigned request', () => {
+      const assignedRequest: AssignedLeaveRequestItem = { ...baseRequest, creatorName: 'Alice Smith' }
+      const result = formatLeaveRequestToTableRowSections(assignedRequest)
+
+      expect(result.creatorName).toBe('Alice Smith')
+    })
+
+    it('should escape HTML in creatorName for assigned request', () => {
+      const assignedRequest: AssignedLeaveRequestItem = { ...baseRequest, creatorName: '<script>alert("xss")</script>' }
+      const result = formatLeaveRequestToTableRowSections(assignedRequest)
+
+      expect(result.creatorName).toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;')
+    })
+
+    it('should render view link to manager hub for assigned request', () => {
+      const assignedRequest: AssignedLeaveRequestItem = { ...baseRequest, creatorName: 'Alice Smith' }
+      const result = formatLeaveRequestToTableRowSections(assignedRequest)
+
+      expect(result.viewLink).toBe(`<a href="${annualLeaveUrls.viewAssignedRequest}/req-1" class="govuk-link">View</a>`)
     })
   })
 
