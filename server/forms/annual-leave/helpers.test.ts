@@ -160,7 +160,9 @@ describe('helpers', () => {
       const assignedRequest: AssignedLeaveRequestItem = { ...baseRequest, creatorName: 'Alice Smith' }
       const result = formatLeaveRequestToTableRowSections(assignedRequest)
 
-      expect(result.viewLink).toBe(`<a href="${annualLeaveUrls.viewAssignedRequest}/req-1" class="govuk-link">View</a>`)
+      expect(result.viewLink).toBe(
+        `<a href="${annualLeaveUrls.viewAssignedRequest}/req-1" class="govuk-link">View/Update</a>`,
+      )
     })
   })
 

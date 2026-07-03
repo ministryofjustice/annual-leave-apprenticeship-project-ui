@@ -71,7 +71,7 @@ const errorBanners = HtmlBlock({
 // buttons:
 const managerHubLinkButton = GovUKLinkButton({
   text: 'Go to Manager Hub',
-  href: '/manager-hub',
+  href: annualLeaveUrls.managerHub,
   classes: 'govuk-button--secondary',
   visibleWhen: Data('isManager').match(Condition.Equals(true)),
 })

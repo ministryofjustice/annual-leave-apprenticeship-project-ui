@@ -3,7 +3,8 @@ import type { AnnualLeaveDeps } from './effects/types'
 import { sidebarStatsComponent } from './components/sidebarStats'
 import { confirmModalComponent } from './components/confirmModal'
 import loginJourney from './journeys/login'
-import { leaveRequestManagementJourney } from './journeys/leave-request-management'
+import { leaveRequestManagementJourney } from './journeys/requests'
+import { managerHubJourney } from './journeys/manager-hub'
 import effectImplementations from './effects'
 
 const annualLeaveRootJourney = journey({
@@ -16,7 +17,7 @@ const annualLeaveRootJourney = journey({
       hmppsHeaderServiceNameLink: '/requests/dashboard',
     },
   },
-  children: [loginJourney, leaveRequestManagementJourney],
+  children: [loginJourney, leaveRequestManagementJourney, managerHubJourney],
 })
 
 export default createForgePackage<AnnualLeaveDeps>({

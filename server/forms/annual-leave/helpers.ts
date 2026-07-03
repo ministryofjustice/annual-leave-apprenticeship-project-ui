@@ -64,6 +64,8 @@ export const formatLeaveRequestToTableRowSections = (
   const status = leaveRequestStatuses[request.status]
   const isAssigned = isAssignedRequest(request)
   const viewUrl = isAssigned ? annualLeaveUrls.viewAssignedRequest : annualLeaveUrls.viewUpdateUserRequest
+  const isPending = isAssigned && status.text === 'Pending'
+  const viewText = isPending ? 'View/Update' : 'View'
 
   return {
     id: request.id,
@@ -73,7 +75,7 @@ export const formatLeaveRequestToTableRowSections = (
     endDate: formatDate(request.endDate),
     requestedOn: formatDateTime(request.createdAt),
     statusTag: `<strong class="govuk-tag ${status?.tagClass ?? ''}">${status?.text ?? request.status}</strong>`,
-    viewLink: `<a href="${viewUrl}/${request.id}" class="govuk-link">View</a>`,
+    viewLink: `<a href="${viewUrl}/${request.id}" class="govuk-link">${viewText}</a>`,
   }
 }
 

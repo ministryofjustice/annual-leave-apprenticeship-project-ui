@@ -51,6 +51,7 @@ const loadAssignedRequests = async (deps: AnnualLeaveDeps, context: AnnualLeaveE
     context.setData('historyAssignedRequests', historyRequests)
     context.setData('hasActiveAssignedRequests', activeRequests.length > 0)
     context.setData('hasHistoryAssignedRequests', historyRequests.length > 0)
+    context.setData('activeAssignedRequestCount', activeRequests.length)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch assigned requests'
 
@@ -60,6 +61,7 @@ const loadAssignedRequests = async (deps: AnnualLeaveDeps, context: AnnualLeaveE
     context.setData('historyAssignedRequests', [])
     context.setData('hasActiveAssignedRequests', false)
     context.setData('hasHistoryAssignedRequests', false)
+    context.setData('activeAssignedRequestCount', 0)
   }
 }
 
