@@ -1,6 +1,11 @@
 import AnnualLeaveApiClient from './annualLeaveApiClient'
-import type { BalanceRes, LoginRes, UserLeaveRequestsRes } from '../interfaces/annualLeaveApi/response'
-import type { CreateLeaveRequestReq } from '../interfaces/annualLeaveApi/request'
+import type {
+  AssignedLeaveRequestItem,
+  BalanceRes,
+  LoginRes,
+  UserLeaveRequestsRes,
+} from '../interfaces/annualLeaveApi/response'
+import type { CreateLeaveRequestReq, DecisionReq } from '../interfaces/annualLeaveApi/request'
 import type { LeaveRequest } from '../interfaces/annualLeaveApi/shared'
 
 jest.mock('../config', () => ({
@@ -24,6 +29,7 @@ describe('AnnualLeaveApiClient', () => {
   let client: AnnualLeaveApiClient
   let mockPost: jest.SpyInstance
   let mockGet: jest.SpyInstance
+  let mockPatch: jest.SpyInstance
   let mockDelete: jest.SpyInstance
 
   beforeEach(() => {
@@ -32,6 +38,7 @@ describe('AnnualLeaveApiClient', () => {
     client = new AnnualLeaveApiClient()
     mockPost = jest.spyOn(client as unknown as { post: jest.Mock }, 'post')
     mockGet = jest.spyOn(client as unknown as { get: jest.Mock }, 'get')
+    mockPatch = jest.spyOn(client as unknown as { patch: jest.Mock }, 'patch')
     mockDelete = jest.spyOn(client as unknown as { delete: jest.Mock }, 'delete')
   })
 
@@ -184,6 +191,89 @@ describe('AnnualLeaveApiClient', () => {
           creatorNote: null,
         }),
       ).rejects.toThrow('Failed to create request')
+    })
+  })
+
+  describe('getAssignedRequests()', () => {
+    it('should fetch assigned requests with user ID header', async () => {
+      const expectedResponse: AssignedLeaveRequestItem[] = [
+        {
+          id: 'req-1',
+          createdAt: '2026-06-01T10:00:00Z',
+          decisionAt: null,
+          creatorId: 'user-789',
+          creatorName: 'Alice Smith',
+          approverId: 'manager-456',
+          startDate: '2026-07-14',
+          endDate: '2026-07-17',
+          duration: 4,
+          isFirstDayHalfDay: false,
+          isLastDayHalfDay: false,
+          status: 'PENDING',
+          creatorNote: 'Holiday',
+          approverNote: null,
+        },
+      ]
+
+      mockGet.mockResolvedValue(expectedResponse)
+
+      const result = await client.getAssignedRequests('manager-456')
+
+      expect(result).toEqual(expectedResponse)
+      expect(mockGet).toHaveBeenCalledWith({
+        path: '/requests/assigned',
+        headers: { 'X-User-Id': 'manager-456' },
+      })
+    })
+
+    it('should propagate errors', async () => {
+      mockGet.mockRejectedValue(new Error('Failed to fetch assigned requests'))
+
+      await expect(client.getAssignedRequests('manager-456')).rejects.toThrow('Failed to fetch assigned requests')
+    })
+  })
+
+  describe('decideRequest()', () => {
+    it('should send decision with user ID header', async () => {
+      const decision: DecisionReq = {
+        status: 'APPROVED',
+        approverNote: 'Enjoy your holiday',
+      }
+
+      const expectedResponse: LeaveRequest = {
+        id: 'req-1',
+        createdAt: '2026-06-01T10:00:00Z',
+        decisionAt: '2026-07-03T14:00:00Z',
+        creatorId: 'user-789',
+        approverId: 'manager-456',
+        startDate: '2026-07-14',
+        endDate: '2026-07-17',
+        duration: 4,
+        isFirstDayHalfDay: false,
+        isLastDayHalfDay: false,
+        status: 'APPROVED',
+        creatorNote: 'Holiday',
+        approverNote: 'Enjoy your holiday',
+      }
+
+      mockPatch.mockResolvedValue(expectedResponse)
+
+      const result = await client.decideRequest('manager-456', 'req-1', decision)
+
+      expect(result).toEqual(expectedResponse)
+      expect(mockPatch).toHaveBeenCalledWith({
+        path: '/requests/assigned/req-1',
+        headers: { 'X-User-Id': 'manager-456' },
+        data: decision,
+      })
+    })
+
+    it('should propagate errors', async () => {
+      mockPatch.mockRejectedValue(new Error('Failed to decide request'))
+
+      await expect(
+        client.decideRequest('manager-456', 'req-1', { status: 'REJECTED', approverNote: null }),
+      ).rejects.toThrow('Failed to decide request')
     })
   })
 

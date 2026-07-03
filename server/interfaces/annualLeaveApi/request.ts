@@ -6,6 +6,11 @@ export interface CreateLeaveRequestReq {
   creatorNote: string | null
 }
 
+export interface DecisionReq {
+  status: 'APPROVED' | 'REJECTED'
+  approverNote: string | null
+}
+
 export interface LoginReq {
   email: string
   password: string

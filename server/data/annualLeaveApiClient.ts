@@ -1,9 +1,14 @@
 import { RestClient } from '@ministryofjustice/hmpps-rest-client'
 import config from '../config'
 import logger from '../logger'
-import { BalanceRes, LoginRes, UserLeaveRequestsRes } from '../interfaces/annualLeaveApi/response'
+import {
+  AssignedLeaveRequestItem,
+  BalanceRes,
+  LoginRes,
+  UserLeaveRequestsRes,
+} from '../interfaces/annualLeaveApi/response'
 import { LeaveRequest } from '../interfaces/annualLeaveApi/shared'
-import { CreateLeaveRequestReq, LoginReq } from '../interfaces/annualLeaveApi/request'
+import { CreateLeaveRequestReq, DecisionReq, LoginReq } from '../interfaces/annualLeaveApi/request'
 
 export default class AnnualLeaveApiClient extends RestClient {
   constructor() {
@@ -37,6 +42,21 @@ export default class AnnualLeaveApiClient extends RestClient {
     return this.delete({
       path: `/requests/${requestId}`,
       headers: { 'X-User-Id': userId },
+    })
+  }
+
+  async getAssignedRequests(userId: string): Promise<AssignedLeaveRequestItem[]> {
+    return this.get({
+      path: '/requests/assigned',
+      headers: { 'X-User-Id': userId },
+    })
+  }
+
+  async decideRequest(userId: string, requestId: string, decision: DecisionReq): Promise<LeaveRequest> {
+    return this.patch({
+      path: `/requests/assigned/${requestId}`,
+      headers: { 'X-User-Id': userId },
+      data: { ...decision },
     })
   }
 
