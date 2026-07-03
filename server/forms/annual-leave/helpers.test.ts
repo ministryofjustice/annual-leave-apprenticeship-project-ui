@@ -1,15 +1,35 @@
 import {
+  datesOverlap,
   escapeHtml,
   formatDate,
   formatDateWithWeekday,
   formatDateTime,
   formatDuration,
   formatLeaveRequestToTableRowSections,
+  formatRequestDetails,
+  isPastDate,
+  isValidIsoDate,
 } from './helpers'
 import { annualLeaveUrls, leaveRequestStatuses } from './constants'
 import { LeaveRequest } from '../../interfaces/annualLeaveApi/shared'
 
 describe('helpers', () => {
+  const baseRequest: LeaveRequest = {
+    id: 'req-1',
+    createdAt: '2026-06-01T10:00:00Z',
+    decisionAt: null,
+    creatorId: 'user-123',
+    approverId: 'manager-456',
+    startDate: '2026-07-01',
+    endDate: '2026-07-05',
+    duration: 5,
+    isFirstDayHalfDay: false,
+    isLastDayHalfDay: false,
+    status: 'PENDING',
+    creatorNote: 'Holiday',
+    approverNote: null,
+  }
+
   describe('escapeHtml()', () => {
     it('should escape ampersands', () => {
       expect(escapeHtml('Tom & Jerry')).toBe('Tom &amp; Jerry')
@@ -73,22 +93,6 @@ describe('helpers', () => {
   })
 
   describe('formatLeaveRequestToTableRowSections()', () => {
-    const baseRequest: LeaveRequest = {
-      id: 'req-1',
-      createdAt: '2026-06-01T10:00:00Z',
-      decisionAt: null,
-      creatorId: 'user-123',
-      approverId: 'manager-456',
-      startDate: '2026-07-01',
-      endDate: '2026-07-05',
-      duration: 5,
-      isFirstDayHalfDay: false,
-      isLastDayHalfDay: false,
-      status: 'PENDING',
-      creatorNote: 'Holiday',
-      approverNote: null,
-    }
-
     it('should format all fields correctly', () => {
       const result = formatLeaveRequestToTableRowSections(baseRequest)
 
@@ -129,6 +133,116 @@ describe('helpers', () => {
       expect(result.viewLink).toBe(
         `<a href="${annualLeaveUrls.viewUpdateUserRequest}/req-1" class="govuk-link">View</a>`,
       )
+    })
+  })
+
+  describe('isValidIsoDate()', () => {
+    it('should return true for valid ISO date string', () => {
+      expect(isValidIsoDate('2026-07-14')).toBe(true)
+    })
+
+    it('should return true for ISO datetime string', () => {
+      expect(isValidIsoDate('2026-07-14T10:00:00Z')).toBe(true)
+    })
+
+    it('should return false for invalid date string', () => {
+      expect(isValidIsoDate('not-a-date')).toBe(false)
+    })
+
+    it('should return false for empty string', () => {
+      expect(isValidIsoDate('')).toBe(false)
+    })
+  })
+
+  describe('isPastDate()', () => {
+    it('should return true for a date in the past', () => {
+      expect(isPastDate('2020-01-01')).toBe(true)
+    })
+
+    it('should return false for a date in the future', () => {
+      expect(isPastDate('2099-12-31')).toBe(false)
+    })
+
+    it('should return false for today', () => {
+      const today = new Date()
+      const isoToday = today.toISOString().split('T')[0]
+
+      expect(isPastDate(isoToday)).toBe(false)
+    })
+  })
+
+  describe('datesOverlap()', () => {
+    it('should return true when ranges fully overlap', () => {
+      expect(
+        datesOverlap(new Date('2026-07-01'), new Date('2026-07-10'), new Date('2026-07-05'), new Date('2026-07-15')),
+      ).toBe(true)
+    })
+
+    it('should return true when one range contains the other', () => {
+      expect(
+        datesOverlap(new Date('2026-07-01'), new Date('2026-07-20'), new Date('2026-07-05'), new Date('2026-07-10')),
+      ).toBe(true)
+    })
+
+    it('should return true when ranges share a single day', () => {
+      expect(
+        datesOverlap(new Date('2026-07-01'), new Date('2026-07-05'), new Date('2026-07-05'), new Date('2026-07-10')),
+      ).toBe(true)
+    })
+
+    it('should return false when ranges do not overlap', () => {
+      expect(
+        datesOverlap(new Date('2026-07-01'), new Date('2026-07-04'), new Date('2026-07-05'), new Date('2026-07-10')),
+      ).toBe(false)
+    })
+
+    it('should return true when ranges are identical', () => {
+      expect(
+        datesOverlap(new Date('2026-07-01'), new Date('2026-07-05'), new Date('2026-07-01'), new Date('2026-07-05')),
+      ).toBe(true)
+    })
+  })
+
+  describe('formatRequestDetails()', () => {
+    it('should format start and end dates with weekday', () => {
+      const result = formatRequestDetails(baseRequest)
+
+      expect(result.startDate).toBe('Wednesday, 1 July 2026')
+      expect(result.endDate).toBe('Sunday, 5 July 2026')
+    })
+
+    it('should format duration', () => {
+      const result = formatRequestDetails(baseRequest)
+
+      expect(result.duration).toBe('5 days')
+    })
+
+    it('should include half day flags', () => {
+      const result = formatRequestDetails({ ...baseRequest, isFirstDayHalfDay: true, isLastDayHalfDay: true })
+
+      expect(result.isFirstDayHalfDay).toBe(true)
+      expect(result.isLastDayHalfDay).toBe(true)
+    })
+
+    it('should format status text from constants', () => {
+      const result = formatRequestDetails(baseRequest)
+
+      expect(result.statusText).toBe(leaveRequestStatuses.PENDING.text)
+      expect(result.statusTagClass).toBe(leaveRequestStatuses.PENDING.tagClass)
+    })
+
+    it('should format decision date when present', () => {
+      const result = formatRequestDetails({ ...baseRequest, decisionAt: '2026-06-15T14:00:00Z' })
+
+      expect(result.decisionAt).toMatch(/15 June 2026 at \d{2}:\d{2}/)
+      expect(result.decisionAtRaw).toBe('2026-06-15T14:00:00Z')
+    })
+
+    it('should return empty string for decision date when null', () => {
+      const result = formatRequestDetails(baseRequest)
+
+      expect(result.decisionAt).toBe('')
+      expect(result.decisionAtRaw).toBe('')
     })
   })
 })
