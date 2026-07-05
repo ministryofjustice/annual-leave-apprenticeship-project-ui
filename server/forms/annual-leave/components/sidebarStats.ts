@@ -6,6 +6,7 @@ import {
   type ResolvableString,
   type ResolvableArray,
 } from '@ministryofjustice/hmpps-forge/core/components'
+import { escapeHtml } from '../helpers'
 
 interface SidebarStatsEntry {
   label: ResolvableString
@@ -28,15 +29,18 @@ export const SidebarStats = (props: SidebarStatsProps): SidebarStats => {
 }
 
 export const sidebarStatsComponent = buildComponent<SidebarStats>('sidebarStats', block => {
+  const heading = escapeHtml(String(block.heading))
   const entries = (block.entries as SidebarStatsEntry[])
     .map(entry => {
-      const style = entry.style ? ` dashboard-stats__card--${entry.style}` : ''
-      const totalHtml = entry.total ? `<span class="govuk-body">/${entry.total}</span>` : ''
+      const label = escapeHtml(String(entry.label))
+      const value = escapeHtml(String(entry.value))
+      const style = entry.style ? ` dashboard-stats__card--${escapeHtml(String(entry.style))}` : ''
+      const totalHtml = entry.total ? `<span class="govuk-body">/${escapeHtml(String(entry.total))}</span>` : ''
 
       return `
       <div class="dashboard-stats__card${style}">
-        <span class="dashboard-stats__number govuk-heading-l govuk-!-margin-bottom-0">${entry.value}${totalHtml}</span>
-        <span class="dashboard-stats__label govuk-body govuk-!-margin-bottom-0">${entry.label}</span>
+        <span class="dashboard-stats__number govuk-heading-l govuk-!-margin-bottom-0">${value}${totalHtml}</span>
+        <span class="dashboard-stats__label govuk-body govuk-!-margin-bottom-0">${label}</span>
       </div>`
     })
     .join('')
@@ -44,7 +48,7 @@ export const sidebarStatsComponent = buildComponent<SidebarStats>('sidebarStats'
   return `
     <div class="dashboard-stats govuk-!-padding-bottom-5">
       <div class="dashboard-stats__card">
-        <span class="govuk-heading-l govuk-!-margin-bottom-0">${block.heading}</span>
+        <span class="govuk-heading-l govuk-!-margin-bottom-0">${heading}</span>
       </div>
       ${entries}
     </div>`
