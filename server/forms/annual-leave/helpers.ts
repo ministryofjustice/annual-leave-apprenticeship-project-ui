@@ -7,6 +7,10 @@ import { FormattedLeaveRequestToSummaryListItem, FormattedLeaveRequestToTableRow
 export const extractErrorMessage = (error: unknown, fallback: string): string =>
   error instanceof SanitisedError ? (error.data?.userMessage ?? fallback) : fallback
 
+// fix for date-only strings ('2026-07-01') which are parsed as midnight UTC, which shows as previous day in BST
+const parseDate = (dateString: string): Date =>
+  new Date(dateString.includes('T') ? dateString : `${dateString}T00:00:00`)
+
 export const escapeHtml = (str: string): string => {
   return str
     .replace(/&/g, '&amp;')
@@ -17,19 +21,19 @@ export const escapeHtml = (str: string): string => {
 }
 
 export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
+  const date = parseDate(dateString)
 
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 export const formatDateWithWeekday = (dateString: string): string => {
-  const date = new Date(dateString)
+  const date = parseDate(dateString)
 
   return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 export const formatDateTime = (dateString: string): string => {
-  const date = new Date(dateString)
+  const date = parseDate(dateString)
   const datePart = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
   const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
 
@@ -37,7 +41,7 @@ export const formatDateTime = (dateString: string): string => {
 }
 
 export const isValidIsoDate = (value: string): boolean => {
-  const date = new Date(value)
+  const date = parseDate(value)
 
   return !Number.isNaN(date.getTime())
 }
@@ -46,7 +50,7 @@ export const isPastDate = (value: string): boolean => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  return new Date(value) < today
+  return parseDate(value) < today
 }
 export const datesOverlap = (startA: Date, endA: Date, startB: Date, endB: Date): boolean =>
   startA <= endB && endA >= startB
