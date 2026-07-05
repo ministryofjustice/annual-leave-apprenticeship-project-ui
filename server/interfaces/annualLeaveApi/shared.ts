@@ -14,4 +14,5 @@ export interface LeaveRequest {
   status: LeaveRequestStatus
   creatorNote: string
   approverNote: string | null
+  decisionSeenAt: string | null
 }

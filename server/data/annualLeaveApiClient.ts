@@ -60,6 +60,13 @@ export default class AnnualLeaveApiClient extends RestClient {
     })
   }
 
+  async markDecisionSeen(userId: string, requestId: string): Promise<LeaveRequest> {
+    return this.patch({
+      path: `/requests/mark-decision-seen/${requestId}`,
+      headers: { 'X-User-Id': userId },
+    })
+  }
+
   async getBalance(userId: string): Promise<BalanceRes> {
     return this.get({
       path: '/balance',

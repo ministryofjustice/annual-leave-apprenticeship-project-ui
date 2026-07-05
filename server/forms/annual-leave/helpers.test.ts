@@ -30,6 +30,7 @@ describe('helpers', () => {
     status: 'PENDING',
     creatorNote: 'Holiday',
     approverNote: null,
+    decisionSeenAt: null,
   }
 
   describe('escapeHtml()', () => {

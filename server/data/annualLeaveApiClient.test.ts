@@ -91,6 +91,7 @@ describe('AnnualLeaveApiClient', () => {
             status: 'PENDING',
             creatorNote: 'Holiday',
             approverNote: null,
+            decisionSeenAt: null,
           },
         ],
       }
@@ -165,6 +166,7 @@ describe('AnnualLeaveApiClient', () => {
         status: 'PENDING',
         creatorNote: 'Summer holiday',
         approverNote: null,
+        decisionSeenAt: null,
       }
 
       mockPost.mockResolvedValue(expectedResponse)
@@ -212,6 +214,7 @@ describe('AnnualLeaveApiClient', () => {
           status: 'PENDING',
           creatorNote: 'Holiday',
           approverNote: null,
+          decisionSeenAt: null,
         },
       ]
 
@@ -254,6 +257,7 @@ describe('AnnualLeaveApiClient', () => {
         status: 'APPROVED',
         creatorNote: 'Holiday',
         approverNote: 'Enjoy your holiday',
+        decisionSeenAt: null,
       }
 
       mockPatch.mockResolvedValue(expectedResponse)
@@ -274,6 +278,43 @@ describe('AnnualLeaveApiClient', () => {
       await expect(
         client.decideRequest('manager-456', 'req-1', { status: 'REJECTED', approverNote: null }),
       ).rejects.toThrow('Failed to decide request')
+    })
+  })
+
+  describe('markDecisionSeen()', () => {
+    it('should send patch request with user ID header', async () => {
+      const expectedResponse: LeaveRequest = {
+        id: 'req-1',
+        createdAt: '2026-06-01T10:00:00Z',
+        decisionAt: '2026-07-03T14:00:00Z',
+        creatorId: 'user-123',
+        approverId: 'manager-456',
+        startDate: '2026-07-14',
+        endDate: '2026-07-17',
+        duration: 4,
+        isFirstDayHalfDay: false,
+        isLastDayHalfDay: false,
+        status: 'APPROVED',
+        creatorNote: 'Holiday',
+        approverNote: 'Enjoy your holiday',
+        decisionSeenAt: '2026-07-04T09:00:00Z',
+      }
+
+      mockPatch.mockResolvedValue(expectedResponse)
+
+      const result = await client.markDecisionSeen('user-123', 'req-1')
+
+      expect(result).toEqual(expectedResponse)
+      expect(mockPatch).toHaveBeenCalledWith({
+        path: '/requests/mark-decision-seen/req-1',
+        headers: { 'X-User-Id': 'user-123' },
+      })
+    })
+
+    it('should propagate errors', async () => {
+      mockPatch.mockRejectedValue(new Error('Failed to mark decision as seen'))
+
+      await expect(client.markDecisionSeen('user-123', 'req-1')).rejects.toThrow('Failed to mark decision as seen')
     })
   })
 
