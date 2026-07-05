@@ -20,7 +20,7 @@ export default step({
     redirectToDashboardIfErrorLoadingUserRequests(),
     redirectToDashboardIfErrorLoadingBalance(),
     access({
-      effects: [AnnualLeaveEffects.loadRequest()],
+      effects: [AnnualLeaveEffects.loadRequest(), AnnualLeaveEffects.markDecisionSeen()],
     }),
   ],
 })

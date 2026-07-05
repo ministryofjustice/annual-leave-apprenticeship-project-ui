@@ -9,6 +9,7 @@ import loadBalance from './requests/loadBalance'
 import deleteRequest from './requests/deleteRequest'
 import createRequest from './requests/createRequest'
 import decideRequest from './requests/decideRequest'
+import markDecisionSeen from './requests/markDecisionSeen'
 import loadNotifications from './requests/loadNotifications'
 
 interface AnnualLeaveEffectShape {
@@ -21,6 +22,7 @@ interface AnnualLeaveEffectShape {
   deleteRequest: () => EffectFunctionExpr
   createRequest: () => EffectFunctionExpr
   decideRequest: () => EffectFunctionExpr
+  markDecisionSeen: () => EffectFunctionExpr
   loadNotifications: () => EffectFunctionExpr
 }
 
@@ -37,6 +39,7 @@ export const { effects: AnnualLeaveEffects, implementations: annualLeaveEffectIm
   deleteRequest,
   createRequest,
   decideRequest,
+  markDecisionSeen,
   loadNotifications,
 })
 

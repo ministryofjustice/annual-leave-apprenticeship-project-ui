@@ -14,6 +14,7 @@ import {
   hasApproverNotes,
   hasCreatorNotes,
   hasCreatorOrApproverNotes,
+  hasDecisionBeenSeen,
   isLoadUserRequestError,
   isPendingRequest,
   request,
@@ -60,6 +61,20 @@ const requestTimeline = MOJTimeline({
         .else(''),
       datetime: { timestamp: request.path('decisionAtRaw'), type: 'datetime' },
       byline: { text: 'you' },
+      visibleWhen: request.path('decisionAt').match(Condition.IsRequired()),
+    },
+    {
+      label: {
+        text: when(hasDecisionBeenSeen)
+          .then(Format('%1 viewed the decision', request.path('creatorName')))
+          .else(Format('Awaiting %1 to view the decision', request.path('creatorName'))),
+      },
+      datetime: {
+        timestamp: when(hasDecisionBeenSeen)
+          .then(request.path('decisionSeenAtRaw'))
+          .else(request.path('decisionAtRaw')),
+        type: 'datetime',
+      },
       visibleWhen: request.path('decisionAt').match(Condition.IsRequired()),
     },
   ],

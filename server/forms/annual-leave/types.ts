@@ -32,5 +32,7 @@ export interface FormattedLeaveRequestToSummaryListItem {
   decisionAtRaw: string
   creatorNote: string
   approverNote: string
+  decisionSeenAt: string
+  decisionSeenAtRaw: string
   status: LeaveRequestStatus
 }

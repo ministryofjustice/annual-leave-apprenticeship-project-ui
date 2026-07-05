@@ -121,6 +121,8 @@ export const formatRequestDetails = (
     decisionAtRaw: request.decisionAt ?? '',
     creatorNote: request.creatorNote,
     approverNote: request.approverNote ?? '',
+    decisionSeenAt: request.decisionSeenAt ? formatDateTime(request.decisionSeenAt) : '',
+    decisionSeenAtRaw: request.decisionSeenAt ?? '',
     status: request.status,
   }
 }

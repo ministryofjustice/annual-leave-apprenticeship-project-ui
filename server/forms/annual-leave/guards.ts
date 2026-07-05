@@ -27,6 +27,7 @@ export const hasCreatorNotes = request.path('creatorNote').match(Condition.IsReq
 export const hasApproverNotes = request.path('approverNote').match(Condition.IsRequired())
 export const creatorNoteForTimeline = Format('Your note: %1', request.path('creatorNote'))
 export const isPendingRequest = request.path('statusText').match(Condition.Equals('Pending'))
+export const hasDecisionBeenSeen = request.path('decisionSeenAt').match(Condition.IsRequired())
 
 // GUARDS:
 export const redirectToLoginIfUnauthenticated = () =>
