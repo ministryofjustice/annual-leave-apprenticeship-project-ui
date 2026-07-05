@@ -1,5 +1,5 @@
-import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../../../logger'
+import { extractErrorMessage } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const authenticateUser = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -11,8 +11,7 @@ const authenticateUser = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveE
     session.user = await deps.annualLeaveApiClient.login({ email, password })
     delete session.loginError
   } catch (error) {
-    const fallbackError = 'Something went wrong while signing in. Please try again later'
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? fallbackError) : fallbackError
+    const message = extractErrorMessage(error, 'Something went wrong while signing in. Please try again later')
 
     logger.info({ email }, `Login failed: ${message}`)
     session.loginError = message

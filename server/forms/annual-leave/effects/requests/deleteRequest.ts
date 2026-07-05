@@ -1,5 +1,5 @@
-import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../../../logger'
+import { extractErrorMessage } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const deleteRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -21,8 +21,7 @@ const deleteRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffe
 
     session.deleteRequestSuccess = `Leave request for ${currentRequest?.duration} (${currentRequest?.startDate} to ${currentRequest?.endDate}) has been successfully deleted`
   } catch (error) {
-    const fallbackError = 'Something went wrong while deleting the request. Please try again'
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? fallbackError) : fallbackError
+    const message = extractErrorMessage(error, 'Something went wrong while deleting the request. Please try again')
 
     logger.error({ requestId, userId: session.user.id }, `Delete request failed: ${message}`)
     session.deleteRequestError = message

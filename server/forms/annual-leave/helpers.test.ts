@@ -1,6 +1,8 @@
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import {
   datesOverlap,
   escapeHtml,
+  extractErrorMessage,
   formatDate,
   formatDateWithWeekday,
   formatDateTime,
@@ -33,6 +35,30 @@ describe('helpers', () => {
     approverNote: null,
     decisionSeenAt: null,
   }
+
+  describe('extractErrorMessage()', () => {
+    it('should return userMessage from SanitisedError when present', () => {
+      const error = new SanitisedError('fail')
+      error.data = { userMessage: 'Invalid credentials' }
+
+      expect(extractErrorMessage(error, 'fallback')).toBe('Invalid credentials')
+    })
+
+    it('should return fallback when SanitisedError has no userMessage', () => {
+      const error = new SanitisedError('fail')
+      error.data = {}
+
+      expect(extractErrorMessage(error, 'fallback')).toBe('fallback')
+    })
+
+    it('should return fallback when error is not a SanitisedError', () => {
+      expect(extractErrorMessage(new Error('something'), 'fallback')).toBe('fallback')
+    })
+
+    it('should return fallback when error is not an Error instance', () => {
+      expect(extractErrorMessage('string error', 'fallback')).toBe('fallback')
+    })
+  })
 
   describe('escapeHtml()', () => {
     it('should escape ampersands', () => {

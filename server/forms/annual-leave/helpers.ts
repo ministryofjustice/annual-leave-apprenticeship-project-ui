@@ -1,7 +1,11 @@
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import type { AssignedLeaveRequestItem } from '../../interfaces/annualLeaveApi/response'
 import type { LeaveRequest } from '../../interfaces/annualLeaveApi/shared'
 import { annualLeaveUrls, leaveRequestStatuses } from './constants'
 import { FormattedLeaveRequestToSummaryListItem, FormattedLeaveRequestToTableRow } from './types'
+
+export const extractErrorMessage = (error: unknown, fallback: string): string =>
+  error instanceof SanitisedError ? (error.data?.userMessage ?? fallback) : fallback
 
 export const escapeHtml = (str: string): string => {
   return str

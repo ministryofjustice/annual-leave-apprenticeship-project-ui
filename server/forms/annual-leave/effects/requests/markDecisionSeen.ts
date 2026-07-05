@@ -1,6 +1,6 @@
-import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../../../logger'
 import type { LeaveRequest } from '../../../../interfaces/annualLeaveApi/shared'
+import { extractErrorMessage } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const markDecisionSeen = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -29,7 +29,7 @@ const markDecisionSeen = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveE
   try {
     await deps.annualLeaveApiClient.markDecisionSeen(session.user.id, requestId)
   } catch (error) {
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? 'Unknown error') : 'Unknown error'
+    const message = extractErrorMessage(error, 'Unknown error')
 
     logger.error({ requestId, userId: session.user.id }, `Mark decision seen failed: ${message}`)
   }

@@ -1,7 +1,13 @@
-import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { LeaveRequest } from '../../../../interfaces/annualLeaveApi/shared'
 import logger from '../../../../logger'
-import { datesOverlap, formatDateWithWeekday, formatDuration, isPastDate, isValidIsoDate } from '../../helpers'
+import {
+  datesOverlap,
+  extractErrorMessage,
+  formatDateWithWeekday,
+  formatDuration,
+  isPastDate,
+  isValidIsoDate,
+} from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const createRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -77,8 +83,7 @@ const createRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffe
     session.createRequestSuccess = `Leave request for ${duration} (${formattedStart} to ${formattedEnd}) has been successfully submitted`
     context.setData('createRequestSuccess', session.createRequestSuccess)
   } catch (error) {
-    const fallbackError = 'Something went wrong while creating the request. Please try again'
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? fallbackError) : fallbackError
+    const message = extractErrorMessage(error, 'Something went wrong while creating the request. Please try again')
 
     logger.error({ userId: session.user.id }, `Create request failed: ${message}`)
     context.setData('createRequestError', message)

@@ -1,6 +1,5 @@
-import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../../../logger'
-import { formatLeaveRequestToTableRowSections, getOnLeaveStatus } from '../../helpers'
+import { extractErrorMessage, formatLeaveRequestToTableRowSections, getOnLeaveStatus } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const sortByCreatedAtDesc = <T extends { createdAt: string }>(items: T[]): T[] =>
@@ -41,8 +40,7 @@ const loadUserRequests = async (deps: AnnualLeaveDeps, context: AnnualLeaveEffec
     context.setData('hasApprovedRequests', approvedRequests.length > 0)
     context.setData('hasRejectedRequests', rejectedRequests.length > 0)
   } catch (error) {
-    const fallbackError = 'Failed to fetch requests'
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? fallbackError) : fallbackError
+    const message = extractErrorMessage(error, 'Failed to fetch requests')
 
     logger.error({ userId }, `Load requests failed: ${message}`)
     context.setData('loadUserRequestsError', true)
@@ -72,8 +70,7 @@ const loadAssignedRequests = async (deps: AnnualLeaveDeps, context: AnnualLeaveE
     context.setData('hasHistoryAssignedRequests', historyRequests.length > 0)
     context.setData('activeAssignedRequestCount', activeRequests.length)
   } catch (error) {
-    const fallbackError = 'Failed to fetch assigned requests'
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? fallbackError) : fallbackError
+    const message = extractErrorMessage(error, 'Failed to fetch assigned requests')
 
     logger.error({ userId }, `Load assigned requests failed: ${message}`)
     context.setData('loadAssignedRequestsError', true)

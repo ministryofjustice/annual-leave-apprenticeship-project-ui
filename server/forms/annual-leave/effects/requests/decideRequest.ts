@@ -1,7 +1,6 @@
-import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../../../logger'
 import type { AssignedLeaveRequestItem } from '../../../../interfaces/annualLeaveApi/response'
-import { formatDateWithWeekday, formatDuration } from '../../helpers'
+import { extractErrorMessage, formatDateWithWeekday, formatDuration } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const decideRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -54,8 +53,7 @@ const decideRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffe
     session.decisionSuccess = `Leave request for ${request.creatorName}: ${duration} (${startDate} to ${endDate}) has been ${action}.`
     context.setData('decisionSuccess', session.decisionSuccess)
   } catch (error) {
-    const fallbackError = 'Something went wrong while processing the decision. Please try again'
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? fallbackError) : fallbackError
+    const message = extractErrorMessage(error, 'Something went wrong while processing the decision. Please try again')
 
     logger.error({ requestId, userId: session.user.id }, `Decision request failed: ${message}`)
     context.setData('decisionError', message)

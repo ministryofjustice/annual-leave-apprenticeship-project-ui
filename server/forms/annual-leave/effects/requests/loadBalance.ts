@@ -1,5 +1,5 @@
-import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import logger from '../../../../logger'
+import { extractErrorMessage } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const loadBalance = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -19,8 +19,7 @@ const loadBalance = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffect
     context.setData('pendingDays', balance.pendingDays)
     context.setData('approvedDays', balance.approvedDays)
   } catch (error) {
-    const fallbackError = 'Failed to fetch balance'
-    const message = error instanceof SanitisedError ? (error.data?.userMessage ?? fallbackError) : fallbackError
+    const message = extractErrorMessage(error, 'Failed to fetch balance')
 
     logger.error({ userId: session.user.id }, `Load balance failed: ${message}`)
     context.setData('loadBalanceError', true)
