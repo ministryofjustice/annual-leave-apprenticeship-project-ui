@@ -1,6 +1,6 @@
 import { access, journey } from '@ministryofjustice/hmpps-forge/core/authoring'
 import { AnnualLeaveEffects } from '../../effects'
-import { redirectToLoginIfUnauthenticated } from '../../guards'
+import { redirectToDashboardIfNotManager, redirectToLoginIfUnauthenticated } from '../../guards'
 import managerHubDashboardStep from './steps/dashboard/step'
 import managerViewUpdateStep from './steps/view-update/step'
 
@@ -11,6 +11,7 @@ export const managerHubJourney = journey({
   steps: [managerHubDashboardStep, managerViewUpdateStep],
   onAccess: [
     redirectToLoginIfUnauthenticated(),
+    redirectToDashboardIfNotManager(),
     access({
       effects: [AnnualLeaveEffects.loadRequests(), AnnualLeaveEffects.loadBalance()],
     }),

@@ -24,3 +24,8 @@ export const redirectToDashboardIfErrorLoadingBalance = () =>
   access({
     next: [redirect({ when: forgeExpressions.errors.isLoadBalanceError, goto: annualLeaveUrls.dashboard })],
   })
+
+export const redirectToDashboardIfNotManager = () =>
+  access({
+    next: [redirect({ when: not(forgeExpressions.manager.isManager), goto: annualLeaveUrls.dashboard })],
+  })

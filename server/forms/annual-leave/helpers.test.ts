@@ -255,10 +255,11 @@ describe('helpers', () => {
     })
 
     it('should return false for today', () => {
-      const today = new Date()
-      const isoToday = today.toISOString().split('T')[0]
+      jest.useFakeTimers({ now: new Date('2026-07-10T12:00:00') })
 
-      expect(isPastDate(isoToday)).toBe(false)
+      expect(isPastDate('2026-07-10')).toBe(false)
+
+      jest.useRealTimers()
     })
   })
 
