@@ -1,16 +1,35 @@
-
 services:
-#  hmpps-template-kotlin:
-#    ports:
-#      - "8080:8080"
+  postgres:
+    image: postgres:16
+    networks:
+      - hmpps
+    tmpfs:
+      - /var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: postgres
+    profiles:
+      - with-api
 
-#  hmpps-auth:
-#    ports:
-#      - "9090:8080"
-
-#  wiremock:
-#    ports:
-#      - "9091:8080"
+  annual-leave-api:
+    image: ghcr.io/ministryofjustice/annual-leave-apprenticeship-project-api:latest
+    networks:
+      - hmpps
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8080"]
+      interval: 5s
+      retries: 20
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: dev
+      APP_DB_ENDPOINT: postgres:5432
+    profiles:
+      - with-api
 
   ui:
     build:
@@ -30,7 +49,7 @@ services:
       NODE_ENV: development
       ENVIRONMENT_NAME: dev
       TOKEN_VERIFICATION_ENABLED: true
-      ANNUAL_LEAVE_API_URL: http://host.docker.internal:8080
+      ANNUAL_LEAVE_API_URL: ${ANNUAL_LEAVE_API_URL:-http://host.docker.internal:8080}
 
 volumes:
   node_modules:

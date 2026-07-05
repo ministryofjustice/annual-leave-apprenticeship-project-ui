@@ -46,7 +46,7 @@ services:
 #    command: --global-response-templating
 
   ui:
-    image: ghcr.io/ministryofjustice/hmpps-template-typescript:${APP_VERSION:-local}
+    image: ghcr.io/ministryofjustice/annual-leave-apprenticeship-project-ui:${APP_VERSION:-local}
     networks:
       - hmpps
     depends_on:

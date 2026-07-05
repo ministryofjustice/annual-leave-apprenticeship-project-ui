@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-PROJECT_NAME = hmpps-template-typescript
+PROJECT_NAME = annual-leave-apprenticeship-project-ui
 
 SERVICE_NAME = ui
 #DEPENDENCY_SERVICES = redis hmpps-auth hmpps-template-kotlin wiremock
@@ -37,21 +37,25 @@ dev-up: ## Starts/restarts a development container. A remote debugger can be att
 	@make install-node-modules
 	@docker compose ${DEV_COMPOSE_FILES} up ${SERVICE_NAME} --wait --no-recreate
 
+dev-up-full-stack: ## Starts the UI with API and Postgres from GHCR (no local API needed).
+	@make install-node-modules
+	@COMPOSE_PROFILES=with-api ANNUAL_LEAVE_API_URL=http://annual-leave-api:8080 docker compose ${DEV_COMPOSE_FILES} up ${SERVICE_NAME} annual-leave-api --wait --no-recreate
+
 down: ## Stops and removes all containers in the project.
-	@docker compose ${DEV_COMPOSE_FILES} down --remove-orphans
+	@COMPOSE_PROFILES=with-api docker compose ${DEV_COMPOSE_FILES} down --remove-orphans
 
 test: ## Runs the unit test suite.
 	@npm run test
 
 e2e: ## Run Playwright tests locally (dev environment must be running).
-	@BASE_URL=http://localhost:3000 WIREMOCK_URL=http://localhost:9091/__admin npx playwright test --reporter=list
+	@BASE_URL=http://localhost:3000 npx playwright test --reporter=list
 
 e2e-ui: ## Run Playwright tests with UI mode (dev environment must be running).
-	@BASE_URL=http://localhost:3000 WIREMOCK_URL=http://localhost:9091/__admin npx playwright test --ui
+	@BASE_URL=http://localhost:3000 npx playwright test --ui
 
 e2e-ci: ## Run Playwright tests in Docker container (for CI).
 	@make install-node-modules
-	@docker compose $(CI_COMPOSE_FILES) up $(SERVICE_NAME) wiremock --wait $(if $(filter local,$(APP_VERSION)),--build) && \
+	@docker compose $(CI_COMPOSE_FILES) up $(SERVICE_NAME) --wait $(if $(filter local,$(APP_VERSION)),--build) && \
 	docker compose $(CI_COMPOSE_FILES) run --rm playwright
 
 typecheck: ## Runs the typecheck.

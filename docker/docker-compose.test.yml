@@ -1,6 +1,32 @@
 # docker-compose.test.yml is used to spin up the app specifically for integration testing.
 
 services:
+  postgres:
+    image: postgres:16
+    networks:
+      - hmpps
+    tmpfs:
+      - /var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: postgres
+
+  annual-leave-api:
+    image: ghcr.io/ministryofjustice/annual-leave-apprenticeship-project-api:latest
+    networks:
+      - hmpps
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8080"]
+      interval: 5s
+      retries: 20
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: dev
+      APP_DB_ENDPOINT: postgres:5432
+
   ui:
     build:
       context: ..
@@ -8,8 +34,8 @@ services:
       target: production
     command: npm run start
     depends_on:
-      - redis
-      - wiremock
+      annual-leave-api:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       ENVIRONMENT_NAME: dev
@@ -17,24 +43,10 @@ services:
       REDIS_ENABLED: false
       REDIS_HOST: redis
       SESSION_SECRET: somesecretvalue
-      HMPPS_AUTH_EXTERNAL_URL: http://wiremock:8080/auth
-      HMPPS_AUTH_URL: http://wiremock:8080/auth
-      AUTH_CODE_CLIENT_ID: clientid
-      AUTH_CODE_CLIENT_SECRET: clientsecret
-      CLIENT_CREDS_CLIENT_ID: clientid
-      CLIENT_CREDS_CLIENT_SECRET: clientsecret
-      TOKEN_VERIFICATION_API_URL: http://wiremock:8080/verification
-      TOKEN_VERIFICATION_ENABLED: true
-      EXAMPLE_API_URL: http://wiremock:8080/example-api
+      TOKEN_VERIFICATION_ENABLED: false
+      ANNUAL_LEAVE_API_URL: http://annual-leave-api:8080
       NO_HTTPS: true
       INGRESS_URL: http://ui:3000
-
-  wiremock:
-    environment:
-      WIREMOCK_HMPPS_AUTH_URL: http://hmpps-auth:8080
-      WIREMOCK_EXAMPLE_API_URL: http://hmpps-template-kotlin:8080
-      WIREMOCK_TOKEN_VERIFICATION_URL: http://hmpps-auth:8080/auth
-    command: --global-response-templating
 
   playwright:
     image: mcr.microsoft.com/playwright:v1.59.1-noble
@@ -42,11 +54,9 @@ services:
       - hmpps
     depends_on:
       - ui
-      - wiremock
     environment:
       CI: true
       BASE_URL: http://ui:3000
-      WIREMOCK_URL: http://wiremock:8080/__admin
     working_dir: /playwright
     command: npx playwright test
     volumes:
