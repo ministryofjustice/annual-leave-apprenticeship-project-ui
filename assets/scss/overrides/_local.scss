@@ -23,3 +23,9 @@
   align-items: center;
   gap: govuk-spacing(3);
 }
+
+.action-with-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: govuk-spacing(2);
+}

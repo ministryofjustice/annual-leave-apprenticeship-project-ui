@@ -62,6 +62,8 @@ export const formatDuration = (duration: number): string => {
   return durationText
 }
 
+export const unseenDecisionBadge = '<span class="moj-notification-badge"></span>'
+
 const isAssignedRequest = (request: LeaveRequest): request is AssignedLeaveRequestItem => 'creatorName' in request
 
 export const formatLeaveRequestToTableRowSections = (
@@ -70,8 +72,18 @@ export const formatLeaveRequestToTableRowSections = (
   const status = leaveRequestStatuses[request.status]
   const isAssigned = isAssignedRequest(request)
   const viewUrl = isAssigned ? annualLeaveUrls.viewAssignedRequest : annualLeaveUrls.viewUpdateUserRequest
-  const isPending = isAssigned && status.text === 'Pending'
-  const viewText = isPending ? 'View/Update' : 'View'
+  const hasUnseenDecision = !isAssigned && request.decisionAt !== null && request.decisionSeenAt === null
+
+  let viewText = 'View'
+  if (isAssigned && status.text === 'Pending') {
+    viewText = 'View/Update'
+  } else if (hasUnseenDecision) {
+    viewText = 'View decision'
+  }
+
+  const viewLink = hasUnseenDecision
+    ? `<span class="action-with-badge"><a href="${viewUrl}/${request.id}" class="govuk-link">${viewText}</a>${unseenDecisionBadge}</span>`
+    : `<a href="${viewUrl}/${request.id}" class="govuk-link">${viewText}</a>`
 
   return {
     id: request.id,
@@ -81,7 +93,7 @@ export const formatLeaveRequestToTableRowSections = (
     endDate: formatDate(request.endDate),
     requestedOn: formatDateTime(request.createdAt),
     statusTag: `<strong class="govuk-tag ${status?.tagClass ?? ''}">${status?.text ?? request.status}</strong>`,
-    viewLink: `<a href="${viewUrl}/${request.id}" class="govuk-link">${viewText}</a>`,
+    viewLink,
   }
 }
 

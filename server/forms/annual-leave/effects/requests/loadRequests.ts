@@ -23,8 +23,16 @@ const loadUserRequests = async (deps: AnnualLeaveDeps, context: AnnualLeaveEffec
     const approvedRaw = sorted.filter(r => r.status === 'APPROVED')
     const onLeaveStatus = getOnLeaveStatus(approvedRaw)
 
+    // unseen decision counts for tab notification badges:
+    const unseenApprovedCount = approvedRaw.filter(r => r.decisionAt && !r.decisionSeenAt).length
+    const unseenRejectedCount = sorted.filter(r => r.status === 'REJECTED' && r.decisionAt && !r.decisionSeenAt).length
+
     context.setData('onLeaveStatus', onLeaveStatus ?? '')
     context.setData('isOnLeave', !!onLeaveStatus)
+    context.setData('unseenApprovedCount', unseenApprovedCount)
+    context.setData('hasUnseenApproved', unseenApprovedCount > 0)
+    context.setData('unseenRejectedCount', unseenRejectedCount)
+    context.setData('hasUnseenRejected', unseenRejectedCount > 0)
     context.setData('loadUserRequestsError', false)
     context.setData('pendingRequests', pendingRequests)
     context.setData('approvedRequests', approvedRequests)

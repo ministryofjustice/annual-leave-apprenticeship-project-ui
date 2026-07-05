@@ -17,7 +17,7 @@ import {
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { HtmlBlock, type ResolvableBoolean } from '@ministryofjustice/hmpps-forge/core/components'
 import { SidebarStats } from './components/sidebarStats'
-import { request } from './guards'
+import { forgeExpressions } from './sharedForgeExpressions'
 
 const managerDetails = GovUKDetails({
   summaryText: 'Your manager details',
@@ -99,9 +99,9 @@ export const requestDurationSummaryList = GovUKSummaryList({
       key: { text: 'Start date:' },
       value: {
         text: Conditional({
-          when: request.path('isFirstDayHalfDay').match(Condition.Equals(true)),
-          then: Format('%1 (half day)', request.path('startDate')),
-          else: request.path('startDate'),
+          when: forgeExpressions.request.data.path('isFirstDayHalfDay').match(Condition.Equals(true)),
+          then: Format('%1 (half day)', forgeExpressions.request.data.path('startDate')),
+          else: forgeExpressions.request.data.path('startDate'),
         }),
       },
     },
@@ -109,15 +109,15 @@ export const requestDurationSummaryList = GovUKSummaryList({
       key: { text: 'End date:' },
       value: {
         text: Conditional({
-          when: request.path('isLastDayHalfDay').match(Condition.Equals(true)),
-          then: Format('%1 (half day)', request.path('endDate')),
-          else: request.path('endDate'),
+          when: forgeExpressions.request.data.path('isLastDayHalfDay').match(Condition.Equals(true)),
+          then: Format('%1 (half day)', forgeExpressions.request.data.path('endDate')),
+          else: forgeExpressions.request.data.path('endDate'),
         }),
       },
     },
     {
       key: { text: 'Duration:' },
-      value: { text: request.path('duration') },
+      value: { text: forgeExpressions.request.data.path('duration') },
     },
   ],
 })

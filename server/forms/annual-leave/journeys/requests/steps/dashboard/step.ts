@@ -1,7 +1,7 @@
 import { access, step, when } from '@ministryofjustice/hmpps-forge/core/authoring'
 import dashboardBlocks from './fields'
 import { AnnualLeaveEffects } from '../../../../effects'
-import { hasDataLoadError } from '../../../../guards'
+import { forgeExpressions } from '../../../../sharedForgeExpressions'
 
 export const dashboardStep = step({
   path: '/dashboard',
@@ -9,7 +9,7 @@ export const dashboardStep = step({
   reachability: { entryWhen: true },
   view: {
     locals: {
-      twoColumnLayout: when(hasDataLoadError).then('').else({ sidebarBlockIndex: 0 }),
+      twoColumnLayout: when(forgeExpressions.errors.hasDataLoadError).then('').else({ sidebarBlockIndex: 0 }),
     },
   },
   onAccess: [

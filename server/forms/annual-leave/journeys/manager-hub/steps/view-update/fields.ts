@@ -10,15 +10,7 @@ import {
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { MOJTimeline } from '@ministryofjustice/hmpps-forge/moj-components'
-import {
-  hasApproverNotes,
-  hasCreatorNotes,
-  hasCreatorOrApproverNotes,
-  hasDecisionBeenSeen,
-  isLoadUserRequestError,
-  isPendingRequest,
-  request,
-} from '../../../../guards'
+import { forgeExpressions } from '../../../../sharedForgeExpressions'
 import { annualLeaveUrls } from '../../../../constants'
 import { createErrorPage, requestDurationSummaryList } from '../../../../sharedBlocks'
 
@@ -30,9 +22,9 @@ const headingWithTag = HtmlBlock({
         <h1 class="govuk-heading-l govuk-!-display-inline-block"> request details for %3</h1>
       </div>
   `,
-    request.path('statusTagClass'),
-    request.path('statusText'),
-    request.path('creatorName'),
+    forgeExpressions.request.data.path('statusTagClass'),
+    forgeExpressions.request.data.path('statusText'),
+    forgeExpressions.request.data.path('creatorName'),
   ),
 })
 
@@ -43,39 +35,39 @@ const summaryListRow = GovUKGridRow({
 const requestTimeline = MOJTimeline({
   items: [
     {
-      label: { text: Format('%1 submitted a request', request.path('creatorName')) },
-      text: when(hasCreatorNotes)
-        .then(Format('Note: %1', request.path('creatorNote')))
+      label: { text: Format('%1 submitted a request', forgeExpressions.request.data.path('creatorName')) },
+      text: when(forgeExpressions.request.hasCreatorNotes)
+        .then(Format('Note: %1', forgeExpressions.request.data.path('creatorNote')))
         .else(''),
-      datetime: { timestamp: request.path('requestedOnRaw'), type: 'datetime' },
+      datetime: { timestamp: forgeExpressions.request.data.path('requestedOnRaw'), type: 'datetime' },
     },
     {
       label: { text: 'Awaiting your decision' },
-      datetime: { timestamp: request.path('requestedOnRaw'), type: 'datetime' },
-      visibleWhen: isPendingRequest,
+      datetime: { timestamp: forgeExpressions.request.data.path('requestedOnRaw'), type: 'datetime' },
+      visibleWhen: forgeExpressions.request.isPending,
     },
     {
-      label: { text: Format('Request %1', request.path('statusText')) },
-      text: when(hasApproverNotes)
-        .then(Format('Your note: %1', request.path('approverNote')))
+      label: { text: Format('Request %1', forgeExpressions.request.data.path('statusText')) },
+      text: when(forgeExpressions.request.hasApproverNotes)
+        .then(Format('Your note: %1', forgeExpressions.request.data.path('approverNote')))
         .else(''),
-      datetime: { timestamp: request.path('decisionAtRaw'), type: 'datetime' },
+      datetime: { timestamp: forgeExpressions.request.data.path('decisionAtRaw'), type: 'datetime' },
       byline: { text: 'you' },
-      visibleWhen: request.path('decisionAt').match(Condition.IsRequired()),
+      visibleWhen: forgeExpressions.request.data.path('decisionAt').match(Condition.IsRequired()),
     },
     {
       label: {
-        text: when(hasDecisionBeenSeen)
-          .then(Format('%1 viewed the decision', request.path('creatorName')))
-          .else(Format('Awaiting %1 to view the decision', request.path('creatorName'))),
+        text: when(forgeExpressions.request.hasDecisionBeenSeen)
+          .then(Format('%1 viewed the decision', forgeExpressions.request.data.path('creatorName')))
+          .else(Format('Awaiting %1 to view the decision', forgeExpressions.request.data.path('creatorName'))),
       },
       datetime: {
-        timestamp: when(hasDecisionBeenSeen)
-          .then(request.path('decisionSeenAtRaw'))
-          .else(request.path('decisionAtRaw')),
+        timestamp: when(forgeExpressions.request.hasDecisionBeenSeen)
+          .then(forgeExpressions.request.data.path('decisionSeenAtRaw'))
+          .else(forgeExpressions.request.data.path('decisionAtRaw')),
         type: 'datetime',
       },
-      visibleWhen: request.path('decisionAt').match(Condition.IsRequired()),
+      visibleWhen: forgeExpressions.request.data.path('decisionAt').match(Condition.IsRequired()),
     },
   ],
 })
@@ -83,7 +75,7 @@ const requestTimeline = MOJTimeline({
 const sectionBreak = GovUKSectionBreak({
   size: 'l',
   visible: true,
-  visibleWhen: hasCreatorOrApproverNotes,
+  visibleWhen: forgeExpressions.request.hasCreatorOrApproverNotes,
 })
 
 // decision form (only for pending requests)
@@ -132,7 +124,7 @@ const submitButton = GovUKButton({
 const decisionForm = HtmlBlock({
   content: [decisionError, decisionRadio, approverNoteField, submitButton],
 })
-decisionForm.visibleWhen = isPendingRequest
+decisionForm.visibleWhen = forgeExpressions.request.isPending
 
 const backButton = GovUKLinkButton({
   text: 'Back to Manager Hub',
@@ -145,12 +137,12 @@ const errorPage = createErrorPage({
   body: ['We could not find the leave request you are looking for. It may have been removed or the link is incorrect.'],
   backHref: annualLeaveUrls.managerHub,
   backText: 'Back to Manager Hub',
-  visibleWhen: isLoadUserRequestError,
+  visibleWhen: forgeExpressions.errors.isLoadUserRequestError,
 })
 
 const requestContent = HtmlBlock({
   content: [headingWithTag, summaryListRow, requestTimeline, sectionBreak, decisionForm, backButton],
 })
-requestContent.visibleWhen = not(isLoadUserRequestError)
+requestContent.visibleWhen = not(forgeExpressions.errors.isLoadUserRequestError)
 
 export default [errorPage, requestContent]

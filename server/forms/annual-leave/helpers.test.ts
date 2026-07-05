@@ -10,6 +10,7 @@ import {
   getOnLeaveStatus,
   isPastDate,
   isValidIsoDate,
+  unseenDecisionBadge,
 } from './helpers'
 import { annualLeaveUrls, leaveRequestStatuses } from './constants'
 import { AssignedLeaveRequestItem } from '../../interfaces/annualLeaveApi/response'
@@ -160,6 +161,34 @@ describe('helpers', () => {
       const result = formatLeaveRequestToTableRowSections(assignedRequest)
 
       expect(result.creatorName).toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;')
+    })
+
+    it('should render "View decision" with badge for unseen decision', () => {
+      const approvedRequest: LeaveRequest = {
+        ...baseRequest,
+        status: 'APPROVED',
+        decisionAt: '2026-07-03T14:00:00Z',
+        decisionSeenAt: null,
+      }
+      const result = formatLeaveRequestToTableRowSections(approvedRequest)
+
+      expect(result.viewLink).toBe(
+        `<span class="action-with-badge"><a href="${annualLeaveUrls.viewUpdateUserRequest}/req-1" class="govuk-link">View decision</a>${unseenDecisionBadge}</span>`,
+      )
+    })
+
+    it('should render "View" without badge for seen decision', () => {
+      const approvedRequest: LeaveRequest = {
+        ...baseRequest,
+        status: 'APPROVED',
+        decisionAt: '2026-07-03T14:00:00Z',
+        decisionSeenAt: '2026-07-04T09:00:00Z',
+      }
+      const result = formatLeaveRequestToTableRowSections(approvedRequest)
+
+      expect(result.viewLink).toBe(
+        `<a href="${annualLeaveUrls.viewUpdateUserRequest}/req-1" class="govuk-link">View</a>`,
+      )
     })
 
     it('should render view link to manager hub for assigned request', () => {

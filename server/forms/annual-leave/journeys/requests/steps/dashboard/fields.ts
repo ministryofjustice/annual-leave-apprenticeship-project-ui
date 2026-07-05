@@ -1,4 +1,4 @@
-import { Condition, Data, Format, not } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { Condition, Data, Format, not, when } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
   GovUKButtonGroup,
   GovUKHeading,
@@ -10,13 +10,13 @@ import {
 import { HtmlBlock, TemplateWrapper } from '@ministryofjustice/hmpps-forge/core/components'
 import { MOJBadge } from '@ministryofjustice/hmpps-forge/moj-components'
 import { createErrorPage, createRequestsTable, createUserSidebar, noRequestsMessage } from '../../../../sharedBlocks'
-import { activeAssignedRequestsCountTagClass, hasDataLoadError, isManager, isOnLeave } from '../../../../guards'
+import { forgeExpressions } from '../../../../sharedForgeExpressions'
 import { annualLeaveUrls } from '../../../../constants'
 
 const onLeaveBadge = MOJBadge({
   text: Data('onLeaveStatus'),
   classes: 'moj-badge--green govuk-!-font-size-36 govuk-!-padding-1',
-  visibleWhen: isOnLeave,
+  visibleWhen: forgeExpressions.user.isOnLeave,
 })
 
 const pageHeading = GovUKHeading({
@@ -40,7 +40,7 @@ const dashboardErrorPage = createErrorPage({
   ],
   backHref: annualLeaveUrls.dashboard,
   backText: 'Try again',
-  visibleWhen: hasDataLoadError,
+  visibleWhen: forgeExpressions.errors.hasDataLoadError,
 })
 
 // banners (for view-update and create request pages):
@@ -84,10 +84,10 @@ const managerHubLinkWithTag = HtmlBlock({
         </a>
     </div>`,
     annualLeaveUrls.managerHub,
-    activeAssignedRequestsCountTagClass,
+    forgeExpressions.manager.activeAssignedRequestsCountTagClass,
     Data('activeAssignedRequestCount'),
   ),
-  visibleWhen: isManager,
+  visibleWhen: forgeExpressions.manager.isManager,
 })
 
 const submitNewRequestLinkButton = GovUKLinkButton({
@@ -116,23 +116,27 @@ const requestsTabs = GovUKTabs({
     },
     {
       id: 'approved-requests-table',
-      label: 'Approved',
+      label: when(forgeExpressions.user.hasUnseenApproved)
+        .then(Format('Approved (%1)', Data('unseenApprovedCount')))
+        .else('Approved'),
       panel: { blocks: [approvedRequestsTable, noRequestsMessage('hasApprovedRequests', 'approved')] },
     },
     {
       id: 'rejected-requests-table',
-      label: 'Rejected',
+      label: when(forgeExpressions.user.hasUnseenRejected)
+        .then(Format('Rejected (%1)', Data('unseenRejectedCount')))
+        .else('Rejected'),
       panel: { blocks: [rejectedRequestsTable, noRequestsMessage('hasRejectedRequests', 'rejected')] },
     },
   ],
 })
 
 const sidebar = createUserSidebar()
-sidebar.visibleWhen = not(hasDataLoadError)
+sidebar.visibleWhen = not(forgeExpressions.errors.hasDataLoadError)
 
 const dashboardContent = HtmlBlock({
   content: [headingWithStatus, actionButtons, errorBanners, successBanners, requestsTabs],
 })
-dashboardContent.visibleWhen = not(hasDataLoadError)
+dashboardContent.visibleWhen = not(forgeExpressions.errors.hasDataLoadError)
 
 export default [sidebar, dashboardErrorPage, dashboardContent]

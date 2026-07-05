@@ -8,7 +8,7 @@ import {
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { createErrorPage, createRequestsTable, noRequestsMessage } from '../../../../sharedBlocks'
 import { annualLeaveUrls } from '../../../../constants'
-import { activeAssignedRequestsCountTagClass, isLoadAssignedRequestsError, requestWord } from '../../../../guards'
+import { forgeExpressions } from '../../../../sharedForgeExpressions'
 
 const errorPage = createErrorPage({
   heading: 'Sorry, there is a problem',
@@ -18,7 +18,7 @@ const errorPage = createErrorPage({
   ],
   backHref: annualLeaveUrls.dashboard,
   backText: 'Back to Dashboard',
-  visibleWhen: isLoadAssignedRequestsError,
+  visibleWhen: forgeExpressions.errors.isLoadAssignedRequestsError,
 })
 
 // content:
@@ -30,9 +30,9 @@ const headingWithTag = HtmlBlock({
         <h1 class="govuk-heading-l govuk-!-display-inline-block"> New %3 - Manager Hub</h1>
       </div>
   `,
-    activeAssignedRequestsCountTagClass,
+    forgeExpressions.manager.activeAssignedRequestsCountTagClass,
     Data('activeAssignedRequestCount'),
-    requestWord,
+    forgeExpressions.manager.requestWordForManagerHubHeading,
   ),
 })
 
@@ -77,6 +77,6 @@ const requestsTabs = GovUKTabs({
 const dashboardContent = HtmlBlock({
   content: [headingWithTag, backToDashboard, decisionErrorBanner, decisionSuccessBanner, requestsTabs],
 })
-dashboardContent.visibleWhen = not(isLoadAssignedRequestsError)
+dashboardContent.visibleWhen = not(forgeExpressions.errors.isLoadAssignedRequestsError)
 
 export default [errorPage, dashboardContent]
