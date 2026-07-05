@@ -56,18 +56,15 @@ export const datesOverlap = (startA: Date, endA: Date, startB: Date, endB: Date)
   startA <= endB && endA >= startB
 
 export const formatDuration = (duration: number): string => {
-  let durationText = ''
-  switch (duration) {
-    case 0.5:
-      durationText = 'Half day'
-      break
-    case 1:
-      durationText = '1 day'
-      break
-    default:
-      durationText = `${duration} days`
+  if (duration === 0.5) {
+    return 'Half day'
   }
-  return durationText
+
+  if (duration === 1) {
+    return '1 day'
+  }
+
+  return `${duration} days`
 }
 
 export const unseenDecisionBadge = '<span class="moj-notification-badge"></span>'
