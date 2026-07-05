@@ -19,7 +19,7 @@ import {
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { MOJDatePicker } from '@ministryofjustice/hmpps-forge/moj-components'
-import { userSidebar } from '../../../../sharedBlocks'
+import { createUserSidebar } from '../../../../sharedBlocks'
 import { annualLeaveUrls } from '../../../../constants'
 
 const todayDDMMYYYY = Generator.Date.Today().pipe(Transformer.Date.Format('DD/MM/YYYY'))
@@ -157,7 +157,7 @@ const actionButtons = GovUKButtonGroup({
 })
 
 export default [
-  userSidebar,
+  createUserSidebar(),
   pageHeading,
   createErrorBanner,
   startDateGroup,

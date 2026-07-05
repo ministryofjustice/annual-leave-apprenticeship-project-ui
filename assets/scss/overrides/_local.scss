@@ -17,3 +17,9 @@
 .moj-messages-container {
   border: none;
 }
+
+.heading-with-badge {
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(3);
+}

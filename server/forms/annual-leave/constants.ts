@@ -1,6 +1,7 @@
+import type { LeaveRequestStatus } from '../../interfaces/annualLeaveApi/shared'
 import { StatusDetails } from './types'
 
-export const leaveRequestStatuses: Record<string, StatusDetails> = {
+export const leaveRequestStatuses: Record<LeaveRequestStatus, StatusDetails> = {
   PENDING: {
     text: 'Pending',
     tagClass: 'govuk-tag--yellow',

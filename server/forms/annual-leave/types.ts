@@ -1,3 +1,5 @@
+import type { LeaveRequestStatus } from '../../interfaces/annualLeaveApi/shared'
+
 export type StatusDetails = {
   text: string
   tagClass: string
@@ -16,6 +18,7 @@ export interface FormattedLeaveRequestToTableRow {
 
 export interface FormattedLeaveRequestToSummaryListItem {
   requestId: string
+  creatorName?: string
   startDate: string
   endDate: string
   duration: string
@@ -29,5 +32,5 @@ export interface FormattedLeaveRequestToSummaryListItem {
   decisionAtRaw: string
   creatorNote: string
   approverNote: string
-  status: string
+  status: LeaveRequestStatus
 }

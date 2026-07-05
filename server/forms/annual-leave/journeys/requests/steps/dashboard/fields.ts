@@ -1,41 +1,47 @@
-import { Condition, Data, Item, Iterator, not } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { Condition, Data, Format, not } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
-  GovUKBody,
   GovUKButtonGroup,
   GovUKHeading,
   GovUKLinkButton,
   GovUKNotificationBanner,
-  GovUKTable,
   GovUKTabs,
   GovUKWarningText,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
-import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
-import { userSidebar } from '../../../../sharedBlocks'
-import { hasDataLoadError } from '../../../../guards'
+import { HtmlBlock, TemplateWrapper } from '@ministryofjustice/hmpps-forge/core/components'
+import { MOJBadge } from '@ministryofjustice/hmpps-forge/moj-components'
+import { createErrorPage, createRequestsTable, createUserSidebar, noRequestsMessage } from '../../../../sharedBlocks'
+import { activeAssignedRequestsCountTagClass, hasDataLoadError, isManager, isOnLeave } from '../../../../guards'
 import { annualLeaveUrls } from '../../../../constants'
+
+const onLeaveBadge = MOJBadge({
+  text: Data('onLeaveStatus'),
+  classes: 'moj-badge--green govuk-!-font-size-36 govuk-!-padding-1',
+  visibleWhen: isOnLeave,
+})
 
 const pageHeading = GovUKHeading({
   text: 'Dashboard',
   size: 'xl',
-  classes: 'govuk-!-margin-bottom-6',
+  classes: 'govuk-!-margin-bottom-0',
 })
 
-// dashboard error (when there is a problem with loading requests)
-const errorHeading = GovUKHeading({
-  text: 'Sorry, there is a problem',
-  size: 'xl',
+const headingWithStatus = TemplateWrapper({
+  template: '<div class="heading-with-badge govuk-!-margin-bottom-6">{{slot:content}}</div>',
+  slots: {
+    content: [pageHeading, onLeaveBadge],
+  },
 })
 
-const errorReason = GovUKBody({
-  text: 'We are experiencing issues getting your annual leave data.',
+const dashboardErrorPage = createErrorPage({
+  heading: 'Sorry, there is a problem',
+  body: [
+    'We are experiencing issues getting your annual leave data.',
+    'Try reloading the page. You can do this by pressing F5 (on a PC), or Cmd + R (on a Mac).',
+  ],
+  backHref: annualLeaveUrls.dashboard,
+  backText: 'Try again',
+  visibleWhen: hasDataLoadError,
 })
-
-const errorActionSuggestion = GovUKBody({
-  text: 'Try reloading the page. You can do this by pressing F5 (on a PC), or Cmd + R (on a Mac).',
-})
-
-const dashboardErrorPage = HtmlBlock({ content: [errorHeading, errorReason, errorActionSuggestion] })
-dashboardErrorPage.visibleWhen = hasDataLoadError
 
 // banners (for view-update and create request pages):
 const deleteSuccessBanner = GovUKNotificationBanner({
@@ -69,11 +75,19 @@ const errorBanners = HtmlBlock({
 })
 
 // buttons:
-const managerHubLinkButton = GovUKLinkButton({
-  text: 'Go to Manager Hub',
-  href: annualLeaveUrls.managerHub,
-  classes: 'govuk-button--secondary',
-  visibleWhen: Data('isManager').match(Condition.Equals(true)),
+const managerHubLinkWithTag = HtmlBlock({
+  content: Format(
+    `<div class="govuk-button-group">
+        <a href="%1" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+          Manager Hub
+          <strong class="govuk-tag %2 govuk-!-padding-2 govuk-!-padding-left-4 govuk-!-padding-right-4 govuk-!-margin-left-1 govuk-!-font-weight-bold"> %3</strong>
+        </a>
+    </div>`,
+    annualLeaveUrls.managerHub,
+    activeAssignedRequestsCountTagClass,
+    Data('activeAssignedRequestCount'),
+  ),
+  visibleWhen: isManager,
 })
 
 const submitNewRequestLinkButton = GovUKLinkButton({
@@ -83,40 +97,11 @@ const submitNewRequestLinkButton = GovUKLinkButton({
 })
 
 const actionButtons = GovUKButtonGroup({
-  buttons: [submitNewRequestLinkButton, managerHubLinkButton],
+  buttons: [submitNewRequestLinkButton, managerHubLinkWithTag],
   classes: 'govuk-button-group--spread',
 })
 
 // tabs and tables:
-const noRequestsMessage = (hasDataKey: string, requestStatus: string) =>
-  GovUKBody({
-    text: `There are no ${requestStatus} requests here yet.`,
-    visibleWhen: Data(hasDataKey).not.match(Condition.Equals(true)),
-  })
-
-const createRequestsTable = (dataKey: string, hasDataKey: string) =>
-  GovUKTable({
-    head: [
-      { text: 'Duration' },
-      { text: 'Start date' },
-      { text: 'End date' },
-      { text: 'Requested on' },
-      { text: 'Status' },
-      { text: 'Action' },
-    ],
-    rows: Data(dataKey).each(
-      Iterator.Map([
-        { text: Item().path('duration') },
-        { text: Item().path('startDate') },
-        { text: Item().path('endDate') },
-        { text: Item().path('requestedOn') },
-        { html: Item().path('statusTag') },
-        { html: Item().path('viewLink') },
-      ]),
-    ),
-    visibleWhen: Data(hasDataKey).match(Condition.Equals(true)),
-  })
-
 const pendingRequestsTable = createRequestsTable('pendingRequests', 'hasPendingRequests')
 const approvedRequestsTable = createRequestsTable('approvedRequests', 'hasApprovedRequests')
 const rejectedRequestsTable = createRequestsTable('rejectedRequests', 'hasRejectedRequests')
@@ -142,11 +127,11 @@ const requestsTabs = GovUKTabs({
   ],
 })
 
-const sidebar = userSidebar
+const sidebar = createUserSidebar()
 sidebar.visibleWhen = not(hasDataLoadError)
 
 const dashboardContent = HtmlBlock({
-  content: [pageHeading, actionButtons, errorBanners, successBanners, requestsTabs],
+  content: [headingWithStatus, actionButtons, errorBanners, successBanners, requestsTabs],
 })
 dashboardContent.visibleWhen = not(hasDataLoadError)
 

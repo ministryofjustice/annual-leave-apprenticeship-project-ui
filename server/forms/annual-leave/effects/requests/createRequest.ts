@@ -44,8 +44,7 @@ const createRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffe
     return
   }
 
-  const existingRequests = (context.getData('userLeaveRequests' as keyof Record<string, LeaveRequest[]>) ??
-    []) as LeaveRequest[]
+  const existingRequests = (context.getData('userLeaveRequests') ?? []) as LeaveRequest[]
   const activeRequests = existingRequests.filter(r => r.status === 'PENDING' || r.status === 'APPROVED')
 
   const overlapping = activeRequests.find(r =>

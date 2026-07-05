@@ -14,7 +14,7 @@ export const dashboardStep = step({
   },
   onAccess: [
     access({
-      effects: [AnnualLeaveEffects.loadDeleteNotification(), AnnualLeaveEffects.loadCreateNotification()],
+      effects: [AnnualLeaveEffects.loadNotifications()],
     }),
   ],
   blocks: dashboardBlocks,

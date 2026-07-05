@@ -7,9 +7,9 @@ import loadRequests from './requests/loadRequests'
 import loadRequest from './requests/loadRequest'
 import loadBalance from './requests/loadBalance'
 import deleteRequest from './requests/deleteRequest'
-import loadDeleteNotification from './requests/loadDeleteNotification'
 import createRequest from './requests/createRequest'
-import loadCreateNotification from './requests/loadCreateNotification'
+import decideRequest from './requests/decideRequest'
+import loadNotifications from './requests/loadNotifications'
 
 interface AnnualLeaveEffectShape {
   authenticateUser: () => EffectFunctionExpr
@@ -19,9 +19,9 @@ interface AnnualLeaveEffectShape {
   loadRequest: () => EffectFunctionExpr
   loadBalance: () => EffectFunctionExpr
   deleteRequest: () => EffectFunctionExpr
-  loadDeleteNotification: () => EffectFunctionExpr
   createRequest: () => EffectFunctionExpr
-  loadCreateNotification: () => EffectFunctionExpr
+  decideRequest: () => EffectFunctionExpr
+  loadNotifications: () => EffectFunctionExpr
 }
 
 export const { effects: AnnualLeaveEffects, implementations: annualLeaveEffectImplementations } = defineEffectFunctions<
@@ -35,9 +35,9 @@ export const { effects: AnnualLeaveEffects, implementations: annualLeaveEffectIm
   loadRequest,
   loadBalance,
   deleteRequest,
-  loadDeleteNotification,
   createRequest,
-  loadCreateNotification,
+  decideRequest,
+  loadNotifications,
 })
 
 export default annualLeaveEffectImplementations

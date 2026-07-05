@@ -1,3 +1,5 @@
+export type LeaveRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+
 export interface LeaveRequest {
   id: string
   createdAt: string
@@ -9,7 +11,7 @@ export interface LeaveRequest {
   duration: number
   isFirstDayHalfDay: boolean
   isLastDayHalfDay: boolean
-  status: string
+  status: LeaveRequestStatus
   creatorNote: string
   approverNote: string | null
 }

@@ -4,7 +4,12 @@ import { annualLeaveUrls, leaveRequestStatuses } from './constants'
 import { FormattedLeaveRequestToSummaryListItem, FormattedLeaveRequestToTableRow } from './types'
 
 export const escapeHtml = (str: string): string => {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 export const formatDate = (dateString: string): string => {
@@ -32,6 +37,7 @@ export const isValidIsoDate = (value: string): boolean => {
 
   return !Number.isNaN(date.getTime())
 }
+
 export const isPastDate = (value: string): boolean => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -79,11 +85,29 @@ export const formatLeaveRequestToTableRowSections = (
   }
 }
 
-export const formatRequestDetails = (request: LeaveRequest): FormattedLeaveRequestToSummaryListItem => {
+export const getOnLeaveStatus = (approvedRequests: LeaveRequest[]): string | undefined => {
+  const todayStr = new Date().toISOString().split('T')[0]
+  const activeRequest = approvedRequests.find(r => todayStr >= r.startDate && todayStr <= r.endDate)
+
+  if (!activeRequest) {
+    return undefined
+  }
+
+  const isHalfDay =
+    (todayStr === activeRequest.startDate && activeRequest.isFirstDayHalfDay) ||
+    (todayStr === activeRequest.endDate && activeRequest.isLastDayHalfDay)
+
+  return isHalfDay ? 'ON LEAVE (Half day)' : 'ON LEAVE'
+}
+
+export const formatRequestDetails = (
+  request: LeaveRequest | AssignedLeaveRequestItem,
+): FormattedLeaveRequestToSummaryListItem => {
   const status = leaveRequestStatuses[request.status]
 
   return {
     requestId: request.id,
+    ...(isAssignedRequest(request) && { creatorName: escapeHtml(request.creatorName) }),
     startDate: formatDateWithWeekday(request.startDate),
     endDate: formatDateWithWeekday(request.endDate),
     duration: formatDuration(request.duration),

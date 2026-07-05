@@ -7,6 +7,7 @@ import {
   formatDuration,
   formatLeaveRequestToTableRowSections,
   formatRequestDetails,
+  getOnLeaveStatus,
   isPastDate,
   isValidIsoDate,
 } from './helpers'
@@ -42,6 +43,10 @@ describe('helpers', () => {
 
     it('should escape double quotes', () => {
       expect(escapeHtml('say "hello"')).toBe('say &quot;hello&quot;')
+    })
+
+    it('should escape single quotes', () => {
+      expect(escapeHtml("it's")).toBe('it&#39;s')
     })
 
     it('should return unchanged string when no special characters', () => {
@@ -233,6 +238,61 @@ describe('helpers', () => {
     })
   })
 
+  describe('getOnLeaveStatus()', () => {
+    const todayStr = new Date().toISOString().split('T')[0]
+
+    const createApprovedRequest = (overrides: Partial<LeaveRequest> = {}): LeaveRequest => ({
+      ...baseRequest,
+      status: 'APPROVED',
+      ...overrides,
+    })
+
+    it('should return undefined when no approved requests', () => {
+      expect(getOnLeaveStatus([])).toBeUndefined()
+    })
+
+    it('should return undefined when today is outside all request ranges', () => {
+      const request = createApprovedRequest({ startDate: '2020-01-01', endDate: '2020-01-10' })
+
+      expect(getOnLeaveStatus([request])).toBeUndefined()
+    })
+
+    it('should return "ON LEAVE" when today is within an approved request range', () => {
+      const request = createApprovedRequest({ startDate: '2020-01-01', endDate: todayStr })
+
+      expect(getOnLeaveStatus([request])).toBe('ON LEAVE')
+    })
+
+    it('should return "ON LEAVE (Half day)" when today is the start date and isFirstDayHalfDay is true', () => {
+      const request = createApprovedRequest({ startDate: todayStr, endDate: todayStr, isFirstDayHalfDay: true })
+
+      expect(getOnLeaveStatus([request])).toBe('ON LEAVE (Half day)')
+    })
+
+    it('should return "ON LEAVE (Half day)" when today is the end date and isLastDayHalfDay is true', () => {
+      const request = createApprovedRequest({ startDate: '2020-01-01', endDate: todayStr, isLastDayHalfDay: true })
+
+      expect(getOnLeaveStatus([request])).toBe('ON LEAVE (Half day)')
+    })
+
+    it('should return "ON LEAVE" when today is the start date but isFirstDayHalfDay is false', () => {
+      const request = createApprovedRequest({ startDate: todayStr, endDate: todayStr, isFirstDayHalfDay: false })
+
+      expect(getOnLeaveStatus([request])).toBe('ON LEAVE')
+    })
+
+    it('should return "ON LEAVE" when today is mid-range even with half day flags', () => {
+      const request = createApprovedRequest({
+        startDate: '2020-01-01',
+        endDate: todayStr,
+        isFirstDayHalfDay: true,
+        isLastDayHalfDay: false,
+      })
+
+      expect(getOnLeaveStatus([request])).toBe('ON LEAVE')
+    })
+  })
+
   describe('formatRequestDetails()', () => {
     it('should format start and end dates with weekday', () => {
       const result = formatRequestDetails(baseRequest)
@@ -273,6 +333,26 @@ describe('helpers', () => {
 
       expect(result.decisionAt).toBe('')
       expect(result.decisionAtRaw).toBe('')
+    })
+
+    it('should include creatorName for assigned request', () => {
+      const assignedRequest: AssignedLeaveRequestItem = { ...baseRequest, creatorName: 'Alice Smith' }
+      const result = formatRequestDetails(assignedRequest)
+
+      expect(result.creatorName).toBe('Alice Smith')
+    })
+
+    it('should escape HTML in creatorName for assigned request', () => {
+      const assignedRequest: AssignedLeaveRequestItem = { ...baseRequest, creatorName: '<script>alert("xss")</script>' }
+      const result = formatRequestDetails(assignedRequest)
+
+      expect(result.creatorName).toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;')
+    })
+
+    it('should not include creatorName for regular request', () => {
+      const result = formatRequestDetails(baseRequest)
+
+      expect(result.creatorName).toBeUndefined()
     })
   })
 })

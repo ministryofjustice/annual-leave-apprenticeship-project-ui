@@ -16,6 +16,8 @@ export interface AnnualLeaveSession extends Session {
   deleteRequestError?: string
   createRequestSuccess?: string
   createRequestError?: string
+  decisionSuccess?: string
+  decisionError?: string
 }
 
 export type AnnualLeaveData = Record<string, unknown>
@@ -28,6 +30,8 @@ export interface AnnualLeaveAnswers extends Record<string, unknown> {
   isFirstDayHalfDay: string[]
   isLastDayHalfDay: string[]
   creatorNote: string
+  decision: string
+  approverNote: string
 }
 
 export type AnnualLeaveRequestState = Record<string, unknown>

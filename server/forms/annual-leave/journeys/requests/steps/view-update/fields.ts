@@ -1,28 +1,23 @@
-import { Condition, Conditional, Data, not, Format, or, when } from '@ministryofjustice/hmpps-forge/core/authoring'
+import { Condition, Data, Format, not, when } from '@ministryofjustice/hmpps-forge/core/authoring'
 import {
-  GovUKBody,
   GovUKButtonGroup,
   GovUKGridRow,
-  GovUKHeading,
   GovUKLinkButton,
   GovUKSectionBreak,
-  GovUKSummaryList,
 } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { MOJTimeline } from '@ministryofjustice/hmpps-forge/moj-components'
-import { userSidebar } from '../../../../sharedBlocks'
-import { isLoadUserRequestError } from '../../../../guards'
+import { createErrorPage, createUserSidebar, requestDurationSummaryList } from '../../../../sharedBlocks'
+import {
+  creatorNoteForTimeline,
+  hasApproverNotes,
+  hasCreatorNotes,
+  hasCreatorOrApproverNotes,
+  isLoadUserRequestError,
+  request,
+} from '../../../../guards'
 import { annualLeaveUrls } from '../../../../constants'
 import { ConfirmModal } from '../../../../components/confirmModal'
-
-const request = Data('currentRequest')
-const hasCreatorOrApproverNotes = or(
-  request.path('creatorNote').match(Condition.IsRequired()),
-  request.path('approverNote').match(Condition.IsRequired()),
-)
-const hasCreatorNotes = request.path('creatorNote').match(Condition.IsRequired())
-const hasApproverNotes = request.path('approverNote').match(Condition.IsRequired())
-const creatorNoteForTimeline = Format('Your note: %1', request.path('creatorNote'))
 
 const headingWithTag = HtmlBlock({
   content: Format(
@@ -35,36 +30,6 @@ const headingWithTag = HtmlBlock({
     request.path('statusTagClass'),
     request.path('statusText'),
   ),
-})
-
-const requestDurationSummaryList = GovUKSummaryList({
-  classes: 'govuk-summary-list--no-border',
-  rows: [
-    {
-      key: { text: 'Start date:' },
-      value: {
-        text: Conditional({
-          when: request.path('isFirstDayHalfDay').match(Condition.Equals(true)),
-          then: Format('%1 (half day)', request.path('startDate')),
-          else: request.path('startDate'),
-        }),
-      },
-    },
-    {
-      key: { text: 'End date:' },
-      value: {
-        text: Conditional({
-          when: request.path('isLastDayHalfDay').match(Condition.Equals(true)),
-          then: Format('%1 (half day)', request.path('endDate')),
-          else: request.path('endDate'),
-        }),
-      },
-    },
-    {
-      key: { text: 'Duration:' },
-      value: { text: request.path('duration') },
-    },
-  ],
 })
 
 const summaryListRow = GovUKGridRow({
@@ -128,19 +93,15 @@ const actionButtons = GovUKButtonGroup({
   classes: 'govuk-button-group--spread',
 })
 
-const errorHeading = GovUKHeading({
-  text: 'Request not found',
-  size: 'xl',
+const errorPage = createErrorPage({
+  heading: 'Request not found',
+  body: ['We could not find the leave request you are looking for. It may have been removed or the link is incorrect.'],
+  backHref: annualLeaveUrls.dashboard,
+  backText: 'Back to dashboard',
+  visibleWhen: isLoadUserRequestError,
 })
 
-const errorBody = GovUKBody({
-  text: 'We could not find the leave request you are looking for. It may have been removed or the link is incorrect.',
-})
-
-const errorPage = HtmlBlock({ content: [errorHeading, errorBody, backButton] })
-errorPage.visibleWhen = isLoadUserRequestError
-
-const sidebar = userSidebar
+const sidebar = createUserSidebar()
 sidebar.visibleWhen = not(isLoadUserRequestError)
 
 const requestContent = HtmlBlock({

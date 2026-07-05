@@ -8,7 +8,7 @@ import {
 
 import { escapeHtml } from '../helpers'
 
-export interface confirmModalParams {
+export interface ConfirmModalParams {
   // @Example "delete-user-leave-request-modal"
   modalId: string
   // @Example "Delete request"
@@ -28,7 +28,7 @@ export interface confirmModalParams {
   cancelLabel?: string
 }
 
-export interface confirmModalProps extends BasicBlockProps {
+export interface ConfirmModalProps extends BasicBlockProps {
   modalId: ResolvableString
   openModalButtonText: ResolvableString
   openModalButtonStyle?: ResolvableString
@@ -40,11 +40,11 @@ export interface confirmModalProps extends BasicBlockProps {
   cancelLabel?: ResolvableString
 }
 
-export interface ConfirmModal extends BlockDefinition, confirmModalProps {
+export interface ConfirmModal extends BlockDefinition, ConfirmModalProps {
   variant: 'ConfirmModal'
 }
 
-export const renderConfirmModalHtml = (params: confirmModalParams): string => {
+export const renderConfirmModalHtml = (params: ConfirmModalParams): string => {
   const modalId = escapeHtml(params.modalId)
   const openModalButtonText = escapeHtml(params.openModalButtonText)
   const openModalButtonStyle = escapeHtml(params.openModalButtonStyle ?? '')
@@ -71,7 +71,7 @@ export const renderConfirmModalHtml = (params: confirmModalParams): string => {
     </dialog>`
 }
 
-export const ConfirmModal = (props: confirmModalProps): ConfirmModal => {
+export const ConfirmModal = (props: ConfirmModalProps): ConfirmModal => {
   return blockBuilder<ConfirmModal>({ ...props, variant: 'ConfirmModal' })
 }
 
