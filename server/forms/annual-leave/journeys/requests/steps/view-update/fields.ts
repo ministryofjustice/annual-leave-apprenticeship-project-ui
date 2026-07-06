@@ -25,10 +25,6 @@ const headingWithTag = HtmlBlock({
   ),
 })
 
-const summaryListRow = GovUKGridRow({
-  columns: [{ width: 'one-half', blocks: [requestDurationSummaryList] }],
-})
-
 const requestTimeline = MOJTimeline({
   items: [
     {
@@ -100,7 +96,7 @@ const sidebar = createUserSidebar()
 sidebar.visibleWhen = not(forgeExpressions.errors.isLoadUserRequestError)
 
 const requestContent = HtmlBlock({
-  content: [headingWithTag, summaryListRow, requestTimeline, sectionBreak, actionButtons],
+  content: [headingWithTag, requestDurationSummaryList, requestTimeline, sectionBreak, actionButtons],
 })
 requestContent.visibleWhen = not(forgeExpressions.errors.isLoadUserRequestError)
 

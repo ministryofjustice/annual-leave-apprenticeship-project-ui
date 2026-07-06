@@ -28,10 +28,6 @@ const headingWithTag = HtmlBlock({
   ),
 })
 
-const summaryListRow = GovUKGridRow({
-  columns: [{ width: 'one-half', blocks: [requestDurationSummaryList] }],
-})
-
 const requestTimeline = MOJTimeline({
   items: [
     {
@@ -141,7 +137,7 @@ const errorPage = createErrorPage({
 })
 
 const requestContent = HtmlBlock({
-  content: [headingWithTag, summaryListRow, requestTimeline, sectionBreak, decisionForm, backButton],
+  content: [headingWithTag, requestDurationSummaryList, requestTimeline, sectionBreak, decisionForm, backButton],
 })
 requestContent.visibleWhen = not(forgeExpressions.errors.isLoadUserRequestError)
 
