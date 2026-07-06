@@ -20,11 +20,11 @@ export default class DashboardPage extends AbstractPage {
 
   private constructor(page: Page) {
     super(page)
-    this.submitRequestButton = page.getByRole('link', { name: 'Submit a new absence request' })
-    this.managerHubButton = page.getByRole('link', { name: /Manager Hub/i })
-    this.pendingTab = page.getByRole('tab', { name: /Pending/i })
-    this.approvedTab = page.getByRole('tab', { name: /Approved/i })
-    this.rejectedTab = page.getByRole('tab', { name: /Rejected/i })
+    this.submitRequestButton = page.getByRole('button', { name: 'Submit a new absence request' })
+    this.managerHubButton = page.getByRole('button', { name: 'Manager Hub' })
+    this.pendingTab = page.getByRole('tab', { name: 'Pending' })
+    this.approvedTab = page.getByRole('tab', { name: 'Approved' })
+    this.rejectedTab = page.getByRole('tab', { name: 'Rejected' })
     this.requestsTable = page.locator('.govuk-table')
     this.notificationBanner = page.locator('.govuk-notification-banner--success')
     this.errorBanner = page.locator('.govuk-warning-text')
@@ -37,7 +37,7 @@ export default class DashboardPage extends AbstractPage {
     return dashboardPage
   }
 
-  async clickSubmitNewRequest(): Promise<void> {
+  async clickSubmitNewAbsenceRequest(): Promise<void> {
     await this.submitRequestButton.click()
   }
 

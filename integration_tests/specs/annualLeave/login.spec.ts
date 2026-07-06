@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import LoginPage from '../../pages/annualLeave/loginPage'
-import { annualLeaveUrls, loginAndNavigateToDashboard } from './annualLeaveUtils'
+import { annualLeaveUrls, loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
 
 test.describe('Login', () => {
   test('should show sign in page', async ({ page }) => {
