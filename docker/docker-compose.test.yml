@@ -57,6 +57,7 @@ services:
     environment:
       CI: true
       BASE_URL: http://ui:3000
+      DB_HOST: postgres
     working_dir: /playwright
     command: npx playwright test
     volumes:
