@@ -3,7 +3,7 @@ import logger from '../../../../logger'
 import {
   datesOverlap,
   extractErrorMessage,
-  formatDateWithWeekday,
+  isoDateToLongDateWithWeekday,
   formatDuration,
   isPastDate,
   isValidIsoDate,
@@ -59,8 +59,8 @@ const createRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffe
 
   if (overlapping) {
     const status = overlapping.status.toLowerCase()
-    const from = formatDateWithWeekday(overlapping.startDate)
-    const to = formatDateWithWeekday(overlapping.endDate)
+    const from = isoDateToLongDateWithWeekday(overlapping.startDate)
+    const to = isoDateToLongDateWithWeekday(overlapping.endDate)
 
     context.setData('createRequestError', `This request overlaps with an existing ${status} request (${from} to ${to})`)
 
@@ -77,8 +77,8 @@ const createRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffe
     })
 
     const duration = formatDuration(request.duration)
-    const formattedStart = formatDateWithWeekday(request.startDate)
-    const formattedEnd = formatDateWithWeekday(request.endDate)
+    const formattedStart = isoDateToLongDateWithWeekday(request.startDate)
+    const formattedEnd = isoDateToLongDateWithWeekday(request.endDate)
 
     session.createRequestSuccess = `Leave request for ${duration} (${formattedStart} to ${formattedEnd}) has been successfully submitted`
     context.setData('createRequestSuccess', session.createRequestSuccess)

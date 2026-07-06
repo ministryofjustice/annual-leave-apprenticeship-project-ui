@@ -1,6 +1,6 @@
 import logger from '../../../../logger'
 import type { AssignedLeaveRequestItem } from '../../../../interfaces/annualLeaveApi/response'
-import { extractErrorMessage, formatDateWithWeekday, formatDuration } from '../../helpers'
+import { extractErrorMessage, isoDateToLongDateWithWeekday, formatDuration } from '../../helpers'
 import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
 
 const decideRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
@@ -46,8 +46,8 @@ const decideRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffe
     })
 
     const duration = formatDuration(request.duration)
-    const startDate = formatDateWithWeekday(request.startDate)
-    const endDate = formatDateWithWeekday(request.endDate)
+    const startDate = isoDateToLongDateWithWeekday(request.startDate)
+    const endDate = isoDateToLongDateWithWeekday(request.endDate)
     const action = decision === 'approve' ? 'approved' : 'rejected'
 
     session.decisionSuccess = `Leave request for ${request.creatorName}: ${duration} (${startDate} to ${endDate}) has been ${action}.`

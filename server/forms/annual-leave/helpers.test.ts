@@ -3,9 +3,9 @@ import {
   datesOverlap,
   escapeHtml,
   extractErrorMessage,
-  formatDate,
-  formatDateWithWeekday,
-  formatDateTime,
+  isoDateToLongDate,
+  isoDateToLongDateWithWeekday,
+  isoDateTimeToLocalDateTime,
   formatDuration,
   formatLeaveRequestToTableRowSections,
   formatRequestDetails,
@@ -86,29 +86,33 @@ describe('helpers', () => {
     })
   })
 
-  describe('formatDate()', () => {
+  describe('isoDateToLongDate()', () => {
     it('should format ISO date string to readable date', () => {
-      expect(formatDate('2026-07-01')).toBe('1 July 2026')
+      expect(isoDateToLongDate('2026-07-01')).toBe('1 July 2026')
     })
 
     it('should format full ISO datetime string to date only', () => {
-      expect(formatDate('2026-12-25T10:00:00Z')).toBe('25 December 2026')
+      expect(isoDateToLongDate('2026-12-25T10:00:00Z')).toBe('25 December 2026')
     })
   })
 
-  describe('formatDateWithWeekday()', () => {
-    it('should format ISO date string with day of the week', () => {
-      expect(formatDateWithWeekday('2026-07-01')).toBe('Wednesday, 1 July 2026')
+  describe('isoDateToLongDateWithWeekday()', () => {
+    it('should format date-only string with day of the week', () => {
+      expect(isoDateToLongDateWithWeekday('2026-07-01')).toBe('Wednesday, 1 July 2026')
     })
 
     it('should format full ISO datetime string with day of the week', () => {
-      expect(formatDateWithWeekday('2026-12-25T10:00:00Z')).toBe('Friday, 25 December 2026')
+      expect(isoDateToLongDateWithWeekday('2026-12-25T10:00:00Z')).toBe('Friday, 25 December 2026')
     })
   })
 
-  describe('formatDateTime()', () => {
+  describe('isoDateTimeToLocalDateTime()', () => {
     it('should format ISO datetime to readable date and time (24-hour format)', () => {
-      expect(formatDateTime('2026-06-01T10:30:00Z')).toMatch(/1 June 2026 at \d{2}:\d{2}/)
+      expect(isoDateTimeToLocalDateTime('2026-06-01T10:30:00Z')).toMatch(/1 June 2026 at \d{2}:\d{2}/)
+    })
+
+    it('should preserve the time and not default to 00:00', () => {
+      expect(isoDateTimeToLocalDateTime('2026-06-01T14:45:00Z')).not.toMatch(/at 00:00/)
     })
   })
 
@@ -255,11 +259,10 @@ describe('helpers', () => {
     })
 
     it('should return false for today', () => {
-      jest.useFakeTimers({ now: new Date('2026-07-10T12:00:00') })
+      // en-CA gives YYYY-MM-DD format using local time, matching the api's date format
+      const todayIso = new Date().toLocaleDateString('en-CA')
 
-      expect(isPastDate('2026-07-10')).toBe(false)
-
-      jest.useRealTimers()
+      expect(isPastDate(todayIso)).toBe(false)
     })
   })
 

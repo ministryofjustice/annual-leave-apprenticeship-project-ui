@@ -1,10 +1,5 @@
 import { Condition, Data, Format, not, when } from '@ministryofjustice/hmpps-forge/core/authoring'
-import {
-  GovUKButtonGroup,
-  GovUKGridRow,
-  GovUKLinkButton,
-  GovUKSectionBreak,
-} from '@ministryofjustice/hmpps-forge/govuk-components'
+import { GovUKButtonGroup, GovUKLinkButton, GovUKSectionBreak } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { HtmlBlock } from '@ministryofjustice/hmpps-forge/core/components'
 import { MOJTimeline } from '@ministryofjustice/hmpps-forge/moj-components'
 import { createErrorPage, createUserSidebar, requestDurationSummaryList } from '../../../../sharedBlocks'
@@ -88,7 +83,7 @@ const errorPage = createErrorPage({
   heading: 'Request not found',
   body: ['We could not find the leave request you are looking for. It may have been removed or the link is incorrect.'],
   backHref: annualLeaveUrls.dashboard,
-  backText: 'Back to dashboard',
+  backText: 'Back to Dashboard',
   visibleWhen: forgeExpressions.errors.isLoadUserRequestError,
 })
 

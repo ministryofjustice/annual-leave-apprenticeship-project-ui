@@ -7,9 +7,17 @@ import { FormattedLeaveRequestToSummaryListItem, FormattedLeaveRequestToTableRow
 export const extractErrorMessage = (error: unknown, fallback: string): string =>
   error instanceof SanitisedError ? (error.data?.userMessage ?? fallback) : fallback
 
-// fix for date-only strings ('2026-07-01') which are parsed as midnight UTC, which shows as previous day in BST
-const parseDate = (dateString: string): Date =>
-  new Date(dateString.includes('T') ? dateString : `${dateString}T00:00:00`)
+// new Date('2026-07-01') parses date-only strings as UTC midnight, showing
+// previous day in BST. the numeric constructor always uses local time.
+const toLocalDate = (dateString: string): Date => {
+  if (!dateString || !/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+    throw new Error(`Expected ISO date string (YYYY-MM-DD), got: '${dateString}'`)
+  }
+
+  const [year, month, day] = dateString.split('T')[0].split('-').map(Number)
+
+  return new Date(year, month - 1, day)
+}
 
 export const escapeHtml = (str: string): string => {
   return str
@@ -20,20 +28,20 @@ export const escapeHtml = (str: string): string => {
     .replace(/'/g, '&#39;')
 }
 
-export const formatDate = (dateString: string): string => {
-  const date = parseDate(dateString)
+export const isoDateToLongDate = (dateString: string): string => {
+  const date = toLocalDate(dateString)
 
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-export const formatDateWithWeekday = (dateString: string): string => {
-  const date = parseDate(dateString)
+export const isoDateToLongDateWithWeekday = (dateString: string): string => {
+  const date = toLocalDate(dateString)
 
   return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-export const formatDateTime = (dateString: string): string => {
-  const date = parseDate(dateString)
+export const isoDateTimeToLocalDateTime = (dateString: string): string => {
+  const date = new Date(dateString)
   const datePart = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
   const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
 
@@ -41,16 +49,20 @@ export const formatDateTime = (dateString: string): string => {
 }
 
 export const isValidIsoDate = (value: string): boolean => {
-  const date = parseDate(value)
+  try {
+    const date = toLocalDate(value)
 
-  return !Number.isNaN(date.getTime())
+    return !Number.isNaN(date.getTime())
+  } catch {
+    return false
+  }
 }
 
 export const isPastDate = (value: string): boolean => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  return parseDate(value) < today
+  return toLocalDate(value) < today
 }
 export const datesOverlap = (startA: Date, endA: Date, startB: Date, endB: Date): boolean =>
   startA <= endB && endA >= startB
@@ -94,9 +106,9 @@ export const formatLeaveRequestToTableRowSections = (
     id: request.id,
     ...(isAssigned && { creatorName: escapeHtml(request.creatorName) }),
     duration: formatDuration(request.duration),
-    startDate: formatDate(request.startDate),
-    endDate: formatDate(request.endDate),
-    requestedOn: formatDateTime(request.createdAt),
+    startDate: isoDateToLongDate(request.startDate),
+    endDate: isoDateToLongDate(request.endDate),
+    requestedOn: isoDateTimeToLocalDateTime(request.createdAt),
     statusTag: `<strong class="govuk-tag ${status?.tagClass ?? ''}">${status?.text ?? request.status}</strong>`,
     viewLink,
   }
@@ -125,20 +137,20 @@ export const formatRequestDetails = (
   return {
     requestId: request.id,
     ...(isAssignedRequest(request) && { creatorName: escapeHtml(request.creatorName) }),
-    startDate: formatDateWithWeekday(request.startDate),
-    endDate: formatDateWithWeekday(request.endDate),
+    startDate: isoDateToLongDateWithWeekday(request.startDate),
+    endDate: isoDateToLongDateWithWeekday(request.endDate),
     duration: formatDuration(request.duration),
     isFirstDayHalfDay: request.isFirstDayHalfDay,
     isLastDayHalfDay: request.isLastDayHalfDay,
-    requestedOn: formatDateTime(request.createdAt),
+    requestedOn: isoDateTimeToLocalDateTime(request.createdAt),
     requestedOnRaw: request.createdAt,
-    decisionAt: request.decisionAt ? formatDateTime(request.decisionAt) : '',
+    decisionAt: request.decisionAt ? isoDateTimeToLocalDateTime(request.decisionAt) : '',
     statusText: status?.text ?? request.status,
     statusTagClass: status?.tagClass ?? '',
     decisionAtRaw: request.decisionAt ?? '',
     creatorNote: request.creatorNote,
     approverNote: request.approverNote ?? '',
-    decisionSeenAt: request.decisionSeenAt ? formatDateTime(request.decisionSeenAt) : '',
+    decisionSeenAt: request.decisionSeenAt ? isoDateTimeToLocalDateTime(request.decisionSeenAt) : '',
     decisionSeenAtRaw: request.decisionSeenAt ?? '',
     status: request.status,
   }
