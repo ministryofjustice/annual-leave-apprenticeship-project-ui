@@ -15,7 +15,7 @@ on:
 
 permissions:
   contents: read
-  checks: write
+  packages: read
 
 jobs:
   e2e_test:
