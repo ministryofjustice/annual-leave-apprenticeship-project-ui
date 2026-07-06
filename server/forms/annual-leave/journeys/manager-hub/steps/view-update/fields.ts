@@ -17,7 +17,7 @@ const headingWithTag = HtmlBlock({
   content: Format(
     `
       <div>
-        <strong class="govuk-tag %1 govuk-!-font-size-36 govuk-!-font-weight-bold">%2</strong>
+        <strong class="govuk-tag %1 govuk-!-font-size-36 govuk-!-font-weight-bold" data-qa="view-assigned-request-status-tag">%2</strong>
         <h1 class="govuk-heading-l govuk-!-display-inline-block"> request details for %3</h1>
       </div>
   `,
