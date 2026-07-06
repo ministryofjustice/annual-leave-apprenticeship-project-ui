@@ -1,0 +1,87 @@
+name: E2E tests
+
+on:
+  workflow_call:
+    inputs:
+      app_version:
+        description: App version
+        required: true
+        type: string
+      docker_multiplatform:
+        description: Docker image is a multiplatform artifact
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  e2e_test:
+    runs-on: ubuntu-latest
+    env:
+      APP_VERSION: ${{ inputs.app_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download docker image
+        if: ${{ ! inputs.docker_multiplatform }}
+        uses: actions/download-artifact@v4
+        with:
+          name: build_image
+          path: ${{ runner.temp }}
+
+      - name: Download amd64 docker image
+        if: ${{ inputs.docker_multiplatform }}
+        uses: actions/download-artifact@v4
+        with:
+          name: image-linux-amd64
+          path: ${{ runner.temp }}/image-linux-amd64
+
+      - name: Restore npm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Load image and pull dependencies
+        run: |
+          docker compose -f docker/docker-compose.test.yml pull --ignore-buildable &
+          docker pull node:24-slim &
+
+          if [[ "${{ inputs.docker_multiplatform }}" == "true" ]]; then
+            docker load --input ${{ runner.temp }}/image-linux-amd64/image.tar
+          else
+            docker load --input ${{ runner.temp }}/build_image.tar
+          fi
+
+          wait
+
+      - name: Run Playwright tests
+        run: make e2e-ci
+
+      - name: Upload test results
+        if: '!cancelled()'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_results
+          path: test_results/
+
+      - name: Archive screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test_results/playwright/test-output/**/*
+
+      - name: Export container logs
+        if: failure()
+        run: make save-logs OUTPUT_LOGS_DIR=${{ runner.temp }}/docker-logs
+
+      - name: Upload docker logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e_docker_logs
+          path: ${{ runner.temp }}/docker-logs

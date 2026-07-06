@@ -88,6 +88,12 @@ install-node-modules: ## Installs Node modules into the Docker volume.
 	      echo "node_modules is up-to-date."; \
 	    fi'
 
+save-logs: ## Saves docker container logs in a directory defined by OUTPUT_LOGS_DIR=
+	mkdir -p ${OUTPUT_LOGS_DIR}
+	docker logs ${PROJECT_NAME}-ui-1 > ${OUTPUT_LOGS_DIR}/ui.log
+	docker logs ${PROJECT_NAME}-annual-leave-api-1 > ${OUTPUT_LOGS_DIR}/annual-leave-api.log
+	docker logs ${PROJECT_NAME}-postgres-1 > ${OUTPUT_LOGS_DIR}/postgres.log
+
 clean: ## Stops and removes all project containers. Deletes local build/cache directories.
 	@docker compose ${DEV_COMPOSE_FILES} down --remove-orphans
 	@docker images -q --filter=reference="ghcr.io/ministryofjustice/*:local" | xargs -r docker rmi
