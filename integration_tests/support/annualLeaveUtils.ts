@@ -1,6 +1,12 @@
-import { type Page } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
+import { AxeBuilder } from '@axe-core/playwright'
 import DashboardPage from '../pages/annualLeave/dashboardPage'
 import LoginPage from '../pages/annualLeave/loginPage'
+
+type AccessibilityCheckOptions = {
+  include?: string
+  disableRules?: string[]
+}
 
 export const annualLeaveUrls = {
   login: '/login',
@@ -45,4 +51,19 @@ export const loginAndNavigateToDashboard = async (
   await loginPage.signIn(email, password)
 
   return DashboardPage.verifyOnPage(page)
+}
+
+// runs a WCAG axe scan on the page and expects no violations
+export const checkAccessibility = async (
+  page: Page,
+  { include = '#main-content', disableRules = [] }: AccessibilityCheckOptions = {},
+): Promise<void> => {
+  let axeBuilder = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).include(include)
+
+  if (disableRules.length > 0) {
+    axeBuilder = axeBuilder.disableRules(disableRules)
+  }
+
+  const accessibilityScanResults = await axeBuilder.analyze()
+  expect(accessibilityScanResults.violations).toEqual([])
 }

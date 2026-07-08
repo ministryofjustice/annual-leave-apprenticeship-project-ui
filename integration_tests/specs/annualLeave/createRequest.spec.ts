@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { futureDate, futureDateLongFormat, loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
+import {
+  checkAccessibility,
+  futureDate,
+  futureDateLongFormat,
+  loginAndNavigateToDashboard,
+} from '../../support/annualLeaveUtils'
 import CreateRequestPage from '../../pages/annualLeave/createRequestPage'
 import DashboardPage from '../../pages/annualLeave/dashboardPage'
 import resetDb from '../../support/resetDb'
@@ -19,6 +24,8 @@ test.describe('Create Request', () => {
     await expect(createPage.errorSummary).toBeVisible()
     await expect(createPage.errorSummary).toContainText('Enter a start date')
     await expect(createPage.errorSummary).toContainText('Enter an end date')
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should show validation error when end date is before start date', async ({ page }) => {
@@ -31,6 +38,8 @@ test.describe('Create Request', () => {
 
     await expect(createPage.errorSummary).toBeVisible()
     await expect(createPage.errorSummary).toContainText('End date must be on or after the start date')
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should create a request and show success banner on dashboard', async ({ page }) => {
@@ -41,6 +50,9 @@ test.describe('Create Request', () => {
     await dashboard.clickSubmitNewAbsenceRequest()
     const createPage = await CreateRequestPage.verifyOnPage(page)
 
+    // Accessibility
+    await checkAccessibility(page)
+
     await createPage.fillDates(startDate, endDate)
     await createPage.creatorNote.fill('Test holiday request')
     await createPage.submit()
@@ -48,6 +60,9 @@ test.describe('Create Request', () => {
     const returnedDashboard = await DashboardPage.verifyOnPage(page)
     await expect(returnedDashboard.notificationBanner).toBeVisible()
     await expect(returnedDashboard.notificationBanner).toContainText('has been successfully submitted')
+
+    // Accessibility
+    await checkAccessibility(page)
 
     const panel = page.locator('.govuk-tabs__panel:not([hidden])')
     const displayDate = futureDateLongFormat(14)

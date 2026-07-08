@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { annualLeaveUrls, loginAndNavigateToDashboard, seededRequestIds } from '../../support/annualLeaveUtils'
+import {
+  annualLeaveUrls,
+  checkAccessibility,
+  loginAndNavigateToDashboard,
+  seededRequestIds,
+} from '../../support/annualLeaveUtils'
 import ManagerHubPage from '../../pages/annualLeave/managerHubPage'
 import ManagerViewRequestPage from '../../pages/annualLeave/managerViewRequestPage'
 import resetDb from '../../support/resetDb'
@@ -18,6 +23,8 @@ test.describe('View and update - Manager Hub', () => {
     await expect(viewPage.summaryList).toContainText('10 June 2026')
     await expect(viewPage.summaryList).toContainText('14 June 2026')
     await expect(viewPage.timeline).toContainText('Family holiday')
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should show validation error when no decision is selected', async ({ page }) => {
@@ -29,6 +36,8 @@ test.describe('View and update - Manager Hub', () => {
 
     await expect(viewPage.errorSummary).toBeVisible()
     await expect(viewPage.errorSummary).toContainText('Select whether you approve or reject this request')
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should approve a pending request and show success banner', async ({ page }) => {
@@ -41,6 +50,8 @@ test.describe('View and update - Manager Hub', () => {
     const hub = await ManagerHubPage.verifyOnPage(page)
     await expect(hub.notificationBanner).toBeVisible()
     await expect(hub.notificationBanner).toContainText('approved')
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should reject a pending request and show success banner', async ({ page }) => {

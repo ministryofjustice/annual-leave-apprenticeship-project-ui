@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
+import { checkAccessibility } from '../../support/annualLeaveUtils'
 
 export default class ViewRequestPage extends AbstractPage {
   readonly statusTag: Locator
@@ -31,8 +32,10 @@ export default class ViewRequestPage extends AbstractPage {
     return viewPage
   }
 
-  async deleteRequest(): Promise<void> {
+  async deleteRequest(page: Page): Promise<void> {
     await this.deleteButton.click()
+    // Accessibility
+    await checkAccessibility(page)
     await this.confirmDeleteLink.click()
   }
 }

@@ -1,12 +1,14 @@
 import { expect, test } from '@playwright/test'
 import LoginPage from '../../pages/annualLeave/loginPage'
-import { annualLeaveUrls, loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
+import { annualLeaveUrls, checkAccessibility, loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
 
 test.describe('Login', () => {
   test('should show sign in page', async ({ page }) => {
     await page.goto(annualLeaveUrls.login)
 
     await LoginPage.verifyOnPage(page)
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should redirect unauthenticated user to login', async ({ page }) => {
@@ -26,6 +28,8 @@ test.describe('Login', () => {
     await loginPage.signIn('wrong@example.com', 'wrongpassword')
 
     await expect(loginPage.errorAlert).toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should show validation error when email is empty', async ({ page }) => {
@@ -35,6 +39,8 @@ test.describe('Login', () => {
     await loginPage.signIn('', 'password123')
 
     await expect(page.locator('.govuk-error-summary').getByText('Enter your email address')).toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should show validation error when password is empty', async ({ page }) => {

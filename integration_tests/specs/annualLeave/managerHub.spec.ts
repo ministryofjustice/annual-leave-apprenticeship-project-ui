@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { annualLeaveUrls, loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
+import { annualLeaveUrls, checkAccessibility, loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
 import ManagerHubPage from '../../pages/annualLeave/managerHubPage'
 import DashboardPage from '../../pages/annualLeave/dashboardPage'
 import resetDb from '../../support/resetDb'
@@ -23,6 +23,8 @@ test.describe('Manager Hub', () => {
 
     const panel = page.locator('.govuk-tabs__panel:not([hidden])')
     await expect(panel.locator('.govuk-table tbody tr', { hasText: '10 June 2026' })).toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should display history tab with approved requests', async ({ page }) => {
@@ -33,6 +35,8 @@ test.describe('Manager Hub', () => {
     await hub.clickTab('History')
     const panel = page.locator('.govuk-tabs__panel:not([hidden])')
     await expect(panel.locator('.govuk-table tbody tr', { hasText: '1 July 2026' })).toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should navigate back to dashboard', async ({ page }) => {

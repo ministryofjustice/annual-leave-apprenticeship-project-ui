@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
+import { checkAccessibility, loginAndNavigateToDashboard } from '../../support/annualLeaveUtils'
 import CreateRequestPage from '../../pages/annualLeave/createRequestPage'
 
 test.describe('Dashboard', () => {
@@ -8,6 +8,8 @@ test.describe('Dashboard', () => {
 
     await expect(page.locator('.dashboard-stats')).toBeVisible()
     await expect(dashboard.submitRequestButton).toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should not show manager hub link for non-manager', async ({ page }) => {
@@ -20,6 +22,8 @@ test.describe('Dashboard', () => {
     const dashboard = await loginAndNavigateToDashboard(page, 'bob@example.com')
 
     await expect(dashboard.managerHubButton).toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should navigate to create request page', async ({ page }) => {

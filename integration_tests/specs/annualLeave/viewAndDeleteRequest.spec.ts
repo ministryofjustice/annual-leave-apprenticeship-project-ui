@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { annualLeaveUrls, loginAndNavigateToDashboard, seededRequestIds } from '../../support/annualLeaveUtils'
+import {
+  annualLeaveUrls,
+  checkAccessibility,
+  loginAndNavigateToDashboard,
+  seededRequestIds,
+} from '../../support/annualLeaveUtils'
 import ViewRequestPage from '../../pages/annualLeave/viewRequestPage'
 import DashboardPage from '../../pages/annualLeave/dashboardPage'
 import resetDb from '../../support/resetDb'
@@ -19,6 +24,8 @@ test.describe('View and Delete Request', () => {
     await expect(viewPage.summaryList).toContainText('14 June 2026')
     await expect(viewPage.timeline).toContainText('Family holiday')
     await expect(viewPage.deleteButton).toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should display approved request without delete button', async ({ page }) => {
@@ -31,6 +38,8 @@ test.describe('View and Delete Request', () => {
     await expect(viewPage.summaryList).toContainText('3 July 2026')
     await expect(viewPage.timeline).toContainText('Short break')
     await expect(viewPage.deleteButton).not.toBeVisible()
+    // Accessibility
+    await checkAccessibility(page)
   })
 
   test('should delete a pending request and show success banner', async ({ page }) => {
@@ -38,11 +47,13 @@ test.describe('View and Delete Request', () => {
     await page.goto(`${annualLeaveUrls.viewUpdateUserRequest}/${seededRequestIds.pending}`)
     const viewPage = await ViewRequestPage.verifyOnPage(page)
 
-    await viewPage.deleteRequest()
+    await viewPage.deleteRequest(page)
 
     const dashboard = await DashboardPage.verifyOnPage(page)
     await expect(dashboard.notificationBanner).toBeVisible()
     await expect(dashboard.notificationBanner).toContainText('deleted')
+    // Accessibility
+    await checkAccessibility(page)
 
     const panel = page.locator('.govuk-tabs__panel:not([hidden])')
     await expect(panel.locator('.govuk-table tbody tr', { hasText: '10 June 2026' })).not.toBeVisible()
