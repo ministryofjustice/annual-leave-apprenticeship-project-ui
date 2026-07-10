@@ -1,0 +1,32 @@
+.app-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: govuk-spacing(9) * 10;
+  width: 90%;
+  margin: 0;
+  padding: 0;
+  border: $govuk-focus-width solid govuk-colour("black");
+
+  &:focus {
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+  }
+
+  &::backdrop {
+    background-color: rgba(govuk-colour("black"), 0.8);
+  }
+
+  &__content {
+    @include govuk-responsive-padding(6);
+  }
+
+  &__cancel {
+    @include govuk-link-common;
+    @include govuk-link-style-default;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+}

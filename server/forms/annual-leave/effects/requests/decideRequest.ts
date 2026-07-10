@@ -1,0 +1,63 @@
+import logger from '../../../../logger'
+import type { AssignedLeaveRequestItem } from '../../../../interfaces/annualLeaveApi/response'
+import { extractErrorMessage, isoDateToLongDateWithWeekday, formatDuration } from '../../helpers'
+import type { AnnualLeaveDeps, AnnualLeaveEffectContext } from '../types'
+
+const decideRequest = (deps: AnnualLeaveDeps) => async (context: AnnualLeaveEffectContext) => {
+  const session = context.getSession()
+  const requestId = context.getRequestParam('id')
+
+  if (!session.user || !requestId) {
+    session.decisionError = 'Something went wrong. Please try again'
+
+    return
+  }
+
+  const decision = context.getAnswer('decision')
+  const approverNote = context.getAnswer('approverNote') || null
+
+  if (decision !== 'approve' && decision !== 'reject') {
+    context.setData('decisionError', 'Select whether to approve or reject this request')
+
+    return
+  }
+
+  const assignedRequests = context.getData('assignedLeaveRequests') as AssignedLeaveRequestItem[] | undefined
+  const request = assignedRequests?.find(r => r.id === requestId)
+
+  if (!request) {
+    session.decisionError = 'Request not found'
+
+    return
+  }
+
+  if (request.status !== 'PENDING') {
+    session.decisionError = `This request has already been ${request.status.toLowerCase()}`
+
+    return
+  }
+
+  const status = decision === 'approve' ? 'APPROVED' : 'REJECTED'
+
+  try {
+    await deps.annualLeaveApiClient.decideRequest(session.user.id, requestId, {
+      status,
+      approverNote,
+    })
+
+    const duration = formatDuration(request.duration)
+    const startDate = isoDateToLongDateWithWeekday(request.startDate)
+    const endDate = isoDateToLongDateWithWeekday(request.endDate)
+    const action = decision === 'approve' ? 'approved' : 'rejected'
+
+    session.decisionSuccess = `Leave request for ${request.creatorName}: ${duration} (${startDate} to ${endDate}) has been ${action}.`
+    context.setData('decisionSuccess', session.decisionSuccess)
+  } catch (error) {
+    const message = extractErrorMessage(error, 'Something went wrong while processing the decision. Please try again')
+
+    logger.error({ requestId, userId: session.user.id }, `Decision request failed: ${message}`)
+    context.setData('decisionError', message)
+  }
+}
+
+export default decideRequest

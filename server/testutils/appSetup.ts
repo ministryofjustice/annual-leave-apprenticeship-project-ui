@@ -6,7 +6,7 @@ import { Forge } from '@ministryofjustice/hmpps-forge/core'
 import { ExpressFrameworkAdapter } from '@ministryofjustice/hmpps-forge/express-nunjucks'
 import { govukComponents } from '@ministryofjustice/hmpps-forge/govuk-components'
 import { mojComponents } from '@ministryofjustice/hmpps-forge/moj-components'
-import examplePackage from '../journeys/example'
+import annualLeavePackage from '../forms/annual-leave'
 import nunjucksSetup from '../utils/nunjucksSetup'
 import errorHandler from '../errorHandler'
 import type { Services } from '../services'
@@ -14,8 +14,10 @@ import AuditService from '../services/auditService'
 import { HmppsUser } from '../interfaces/hmppsUser'
 import setUpWebSession from '../middleware/setUpWebSession'
 import HmppsAuditClient from '../data/hmppsAuditClient'
+import AnnualLeaveApiClient from '../data/annualLeaveApiClient'
 
 jest.mock('../services/auditService')
+jest.mock('../data/annualLeaveApiClient')
 
 export const user: HmppsUser = {
   name: 'FIRST LAST',
@@ -42,9 +44,9 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
   })
   forge.registerGlobalComponents(govukComponents)
   forge.registerGlobalComponents(mojComponents)
-  forge.registerPackage(examplePackage, {
+  forge.registerPackage(annualLeavePackage, {
     auditService: services.auditService,
-    exampleService: services.exampleService,
+    annualLeaveApiClient: services.annualLeaveApiClient,
   })
 
   app.use(setUpWebSession())
@@ -79,6 +81,7 @@ export function appWithAllRoutes({
   production = false,
   services = {
     auditService: new AuditService({} as HmppsAuditClient) as jest.Mocked<AuditService>,
+    annualLeaveApiClient: new AnnualLeaveApiClient() as jest.Mocked<AnnualLeaveApiClient>,
   },
   userSupplier = () => user,
 }: {

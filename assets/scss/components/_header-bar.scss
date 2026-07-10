@@ -1,7 +1,7 @@
 .hmpps-header {
-  @include govuk-responsive-padding(3, 'top');
-  @include govuk-responsive-padding(3, 'bottom');
-  background-color: govuk-colour('black');
+  @include govuk-responsive-padding(5, 'top');
+  @include govuk-responsive-padding(5, 'bottom');
+  background-color: govuk-colour('dark-grey');
 
   &__container {
     @include govuk-width-container;
@@ -70,6 +70,11 @@
         display: block;
       }
     }
+  }
+
+  &__name {
+    @include govuk-font(19);
+    color: govuk-colour('white');
   }
 
   &__navigation {

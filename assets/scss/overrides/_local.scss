@@ -1,3 +1,31 @@
 .govuk-main-wrapper {
   min-height: 600px;
 }
+
+.govuk-template {
+  background-color: govuk-colour("white");
+}
+
+.govuk-link:visited {
+  color: $govuk-link-colour;
+}
+
+.govuk-button-group--spread {
+  justify-content: space-between;
+}
+
+.heading-with-badge {
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(3);
+}
+
+.action-with-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: govuk-spacing(2);
+}
+
+.govuk-summary-list--no-border {
+  width: auto;
+}

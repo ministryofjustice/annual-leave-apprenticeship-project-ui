@@ -19,7 +19,6 @@ export default defineConfig({
   globalTimeout: 60 * 60 * 1000,
   /* Run tests in files in parallel */
   fullyParallel: false,
-  /* Ensure tests run consecutively due to inability to share wiremock instance */
   workers: 1,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,

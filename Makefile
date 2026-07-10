@@ -1,9 +1,9 @@
 SHELL = /bin/bash
 
-PROJECT_NAME = hmpps-template-typescript
+PROJECT_NAME = annual-leave-apprenticeship-project-ui
 
 SERVICE_NAME = ui
-DEPENDENCY_SERVICES = redis hmpps-auth hmpps-template-kotlin wiremock
+#DEPENDENCY_SERVICES = redis hmpps-auth hmpps-template-kotlin wiremock
 
 APP_VERSION ?= local
 NODE_MODULES_LAYOUT_VERSION = standalone-layout-v1
@@ -35,23 +35,27 @@ dev-build: ## Builds a development image of the app and installs Node dependenci
 
 dev-up: ## Starts/restarts a development container. A remote debugger can be attached on port 9229.
 	@make install-node-modules
-	@docker compose ${DEV_COMPOSE_FILES} up ${SERVICE_NAME} ${DEPENDENCY_SERVICES} --wait --no-recreate
+	@docker compose ${DEV_COMPOSE_FILES} up ${SERVICE_NAME} --wait --no-recreate
+
+dev-up-full-stack: ## Starts the UI with API and Postgres from GHCR (no local API needed).
+	@make install-node-modules
+	@COMPOSE_PROFILES=with-api ANNUAL_LEAVE_API_URL=http://annual-leave-api:8080 docker compose ${DEV_COMPOSE_FILES} up ${SERVICE_NAME} annual-leave-api --wait --no-recreate
 
 down: ## Stops and removes all containers in the project.
-	@docker compose ${DEV_COMPOSE_FILES} down --remove-orphans
+	@COMPOSE_PROFILES=with-api docker compose ${DEV_COMPOSE_FILES} down --remove-orphans
 
 test: ## Runs the unit test suite.
 	@npm run test
 
 e2e: ## Run Playwright tests locally (dev environment must be running).
-	@BASE_URL=http://localhost:3000 WIREMOCK_URL=http://localhost:9091/__admin npx playwright test --reporter=list
+	@BASE_URL=http://localhost:3000 npx playwright test --reporter=list
 
 e2e-ui: ## Run Playwright tests with UI mode (dev environment must be running).
-	@BASE_URL=http://localhost:3000 WIREMOCK_URL=http://localhost:9091/__admin npx playwright test --ui
+	@BASE_URL=http://localhost:3000 npx playwright test --ui
 
 e2e-ci: ## Run Playwright tests in Docker container (for CI).
 	@make install-node-modules
-	@docker compose $(CI_COMPOSE_FILES) up $(SERVICE_NAME) wiremock --wait $(if $(filter local,$(APP_VERSION)),--build) && \
+	@docker compose $(CI_COMPOSE_FILES) up $(SERVICE_NAME) --wait $(if $(filter local,$(APP_VERSION)),--build) && \
 	docker compose $(CI_COMPOSE_FILES) run --rm playwright
 
 typecheck: ## Runs the typecheck.
@@ -83,6 +87,12 @@ install-node-modules: ## Installs Node modules into the Docker volume.
 	    else \
 	      echo "node_modules is up-to-date."; \
 	    fi'
+
+save-logs: ## Saves docker container logs in a directory defined by OUTPUT_LOGS_DIR=
+	mkdir -p ${OUTPUT_LOGS_DIR}
+	docker logs ${PROJECT_NAME}-ui-1 > ${OUTPUT_LOGS_DIR}/ui.log
+	docker logs ${PROJECT_NAME}-annual-leave-api-1 > ${OUTPUT_LOGS_DIR}/annual-leave-api.log
+	docker logs ${PROJECT_NAME}-postgres-1 > ${OUTPUT_LOGS_DIR}/postgres.log
 
 clean: ## Stops and removes all project containers. Deletes local build/cache directories.
 	@docker compose ${DEV_COMPOSE_FILES} down --remove-orphans

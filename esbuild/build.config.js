@@ -24,6 +24,11 @@ const getBuildConfig = () => {
           to: path.join(cwd, 'dist/server/views'),
           watch: isWatchMode,
         },
+        {
+          from: path.join(cwd, 'server/forms/**/*.njk'),
+          to: path.join(cwd, 'dist/server/forms'),
+          watch: isWatchMode,
+        },
       ],
     },
 

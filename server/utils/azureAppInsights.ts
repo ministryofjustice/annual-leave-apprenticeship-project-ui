@@ -48,10 +48,8 @@ function parameterisePaths(envelope: EnvelopeTelemetry, contextObjects: Record<s
     contextObjects?.correlationContext as CorrelationContext
   )?.customProperties?.getProperty('operationName')
   if (operationNameOverride) {
-    /*  eslint-disable no-param-reassign */
     envelope.tags['ai.operation.name'] = operationNameOverride
     if (envelope.data.baseData) envelope.data.baseData.name = operationNameOverride
-    /*  eslint-enable no-param-reassign */
   }
   return true
 }
