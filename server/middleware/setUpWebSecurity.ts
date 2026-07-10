@@ -34,7 +34,7 @@ export default function setUpWebSecurity(): Router {
             (_req: IncomingMessage, res: ServerResponse) => `'nonce-${(res as Response).locals.cspNonce}'`,
           ],
           fontSrc: ["'self'"],
-          formAction: [`'self' ${config.apis.hmppsAuth.externalUrl}`],
+          formAction: [`'self'`],
           ...(config.https ? {} : { upgradeInsecureRequests: null }),
         },
       },

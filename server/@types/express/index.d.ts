@@ -1,4 +1,3 @@
-import { HmppsUser } from '../../interfaces/hmppsUser'
 import { LoginRes } from '../../interfaces/annualLeaveApi/response'
 
 export declare module 'express-session' {
@@ -25,7 +24,6 @@ export declare global {
     }
 
     interface Locals {
-      user: HmppsUser
       sessionUser?: LoginRes
       cspNonce: string
       csrfToken: string

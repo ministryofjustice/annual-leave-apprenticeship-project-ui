@@ -32,7 +32,7 @@ export const user: HmppsUser = {
 
 export const flashProvider = jest.fn()
 
-function appSetup(services: Services, production: boolean, userSupplier: () => HmppsUser): Express {
+function appSetup(services: Services, production: boolean): Express {
   const app = express()
 
   app.set('view engine', 'njk')
@@ -51,10 +51,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
 
   app.use(setUpWebSession())
   app.use((req, res, next) => {
-    req.user = userSupplier() as Express.User
-    req.flash = flashProvider
     res.locals = {
-      user: { ...req.user } as HmppsUser,
       cspNonce: '',
       csrfToken: '',
       asset_path: '',
@@ -83,11 +80,10 @@ export function appWithAllRoutes({
     auditService: new AuditService({} as HmppsAuditClient) as jest.Mocked<AuditService>,
     annualLeaveApiClient: new AnnualLeaveApiClient() as jest.Mocked<AnnualLeaveApiClient>,
   },
-  userSupplier = () => user,
 }: {
   production?: boolean
   services?: Partial<Services>
   userSupplier?: () => HmppsUser
 }): Express {
-  return appSetup(services as Services, production, userSupplier)
+  return appSetup(services as Services, production)
 }
